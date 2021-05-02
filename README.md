@@ -193,10 +193,11 @@ URANUS-UPM1a:upm1:# ./linux_hw_au.sh sgu3 URANUS
 ```
 You can print necessary inventory data only:
 ``` shell
-URANUS-UPM1a:upm1:# ./linux_hw_au.sh urp | awk -F '|' '{print $2"|"$5"|"$6}' HOSTNAME |HW TYPE |HW SN
-urp1 |IBM eServer BladeCenter |OLOLO
-urp2 |IBM eServer BladeCenter |OLOLO1
-urp3 |DPM3 PFS-379/380 |See IPMI FRU
+URANUS-UPM1a:upm1:# ./linux_hw_au.sh urp | awk -F '|' '{print $2"|"$5"|"$6}' 
+HOSTNAME |HW TYPE                 |HW SN
+    urp1 |IBM eServer BladeCenter |OLOLO
+    urp2 |IBM eServer BladeCenter |OLOLO1
+    urp3 |DPM3 PFS-379/380        |See IPMI FRU
 URANUS-UPM1a:upm1:#
 ```
 Or forward output into the file for further analysis:
@@ -238,9 +239,9 @@ You can print necessary inventory data only:
 ``` shell
 upm1:# ./aix_hw_au.sh sdp | awk -F '|' '{print $2"|"$3"|"$44"|"$45"|"$46}' 
 HOSTNAME |HW TYPE |CPU CLOCK |NUM OF CPU |RAM SIZE
-sdp1a |POWER8 |3891 MHz |12 |253952 MB
+sdp1a    |POWER8  |3891 MHz  |12         |253952 MB
 ...
-sdp9b |POWER8 |3891 MHz |6 |186624 MB
+sdp9b    |POWER8  |3891 MHz  |6          |186624 MB
 URANUS-UPM1a:upm1:#
 ```
 Or forward output into the file for further analysis:
