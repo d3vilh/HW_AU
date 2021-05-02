@@ -4,15 +4,15 @@ Runs audit for all AIX and Linux servers in /etc/hosts of your master node and p
 
 PREREQUISITES
 --------------
-* Require Bash 3 version or higher on the host server (`bash --version`) 
-* The /etc/hosts file on the host server should be reviewed before the first run
+* Require **Bash version 3** or higher on the master server (`bash --version`) 
+* The `/etc/hosts` file on the master server should be reviewed before the first run
 * SSH password-less access needs be configured across all UNIX servers (Linux and AIX). If this configuration is missed the utility will ask for the password for every server where no ssh certificates is present
 * For IBM v7000 and fs900 storages, ssh password-less access needs to be present on SDP_A node to both storage enclosures(active and stby.). This is default configuration.
 * The Hardware Inventory tool support any Linux or AIX versions on the remote servers by default. However, Site specific configuration should be done for `audit.run` script.
 
 PREPARATION
 -----------
-**1. The `/etc/hosts` file** on the host server should be ready to run inventory, as it takes servers list from the host server `/etc/hosts` file.
+**1. The `/etc/hosts` file** on the master server should be ready to run inventory, as it takes servers list from the masters server `/etc/hosts` file.
 The scripts uses special filters to avoid running inventory on the same host several times. As addition cause you can add special filter to exclude not necessary servers from the inventory list by adding the line `#audit_exclude` for every `/etc/hosts` server record. For example:
 
 ``` shell
@@ -52,7 +52,7 @@ URANUS-SDP23:sdp1:/#
 
 **4. Beware that to some POWER8 SDPs both type of the storages** (v7000 and fs900) can be connected to one SDP server (different VGs are located on different storages). Be sure that you have both `san_console` and `san_console_flash` IP addresses in `/etc/hosts` file on **both SDP_A and SDP_B nodes** for this type of servers.
 
-5. Double check that SDP_A known_hosts file contains records for new san_console and `san_console_flash` hosts:
+**5. Double check** that SDP_A `known_hosts` file contains records for new san_console and `san_console_flash` hosts:
 ``` shell
 URANUS-SDP23a:sdp1:/# ssh superuser@san_console 'lssystem'| grep code_level 
 code_level 7.8.1.10 (build 135.9.1905291321000)
@@ -113,9 +113,9 @@ FCS-23A# exit
 
 Confirm password-less access is configured for both fcswa and fcswb switches from SDP_A node:
 ``` shell
-sdp23a:/# ssh -q audit@fcswa 'sh inventory' | head -1 | awk '{print $4,$5}'; 
+URANUS-sdp23a:/# ssh -q audit@fcswa 'sh inventory' | head -1 | awk '{print $4,$5}'; 
 MDS 9148S
-sdp23a:/# ssh -q audit@fcswb 'sh inventory' | head -1 | awk '{print $4,$5}'; 
+URANUS-sdp23a:/# ssh -q audit@fcswb 'sh inventory' | head -1 | awk '{print $4,$5}'; 
 MDS 9148S
 sdp23a:/#
 ```
@@ -203,9 +203,9 @@ Or forward output into the file for further analysis:
 ``` shell
 CSCOM-UPM1a:upm1:# ./linux_hw_au.sh dslu URANUS > URANUS.LINUX.`date +’%d.%m.%Y'`.csv 
 CSCOM-UPM1a:upm1:# ls -lrt *.csv
--rw-r--r-- 1 root root 6310 Jan 20 22:36 URANUS.LINUX.20.01.2021.csv 
-URANUS-UPM1a:upm1:# wc -l URANUS.LINUX.20.01.2021.csv
-42 URANUS.LINUX.20.01.2021.csv
+-rw-r--r-- 1 root root 6310 Jan 20 22:36 URANUS.LINUX.20.01.2015.csv 
+URANUS-UPM1a:upm1:# wc -l URANUS.LINUX.20.01.2015.csv
+42 URANUS.LINUX.20.01.2015.csv
 URANUS-UPM1a:upm1:#
 ```
 
@@ -247,9 +247,9 @@ Or forward output into the file for further analysis:
 ``` shell
 URANUS-UPM1a:upm1:# ./aix_hw_au.sh sdp URANUS > URANUS.AIX.`date +’%d.%m.%Y'`.csv 
 URANUS-UPM1a:upm1:# ls -lrt *.csv
--rw-r--r-- 1 root root 6310 Jan 20 22:43 URANUS.AIX.20.01.2021.csv 
-URANUS-UPM1a:upm1:# wc -l URANUS.AIX.20.01.2021.csv
-14 URANUS.AIX.20.01.2021.csv
+-rw-r--r-- 1 root root 6310 Jan 20 22:43 URANUS.AIX.20.01.2015.csv 
+URANUS-UPM1a:upm1:# wc -l URANUS.AIX.20.01.2015.csv
+14 URANUS.AIX.20.01.2015.csv
 URANUS-UPM1a:upm1:#
 ```
 
@@ -262,6 +262,7 @@ To import Inventory data from your .CSV file open Excel and go to `Data > From T
 Choose your .CSV file and press `“Open”` - new window will appear.
 In new window choose `--Custom--` as a delimiter, from the list, enter pipe (`|`) in the field right below and then press `“Load”`.
 ![image](https://i.imgur.com/8A7JSnw.png)
+
 The new Tab will be opened with your data.
 
-
+#Thats all folks!
