@@ -1,15 +1,27 @@
 #!/bin/bash
 #Shilov 2015
-#ver 2.8.5 02.04.2021 Templates introduced #ver 2.8.4 new storge IBM 5k and backyp-gw #2.8.3.3 output conveyor fixed #2.8.2 +WL, UP and java ver. #fix for LNX6.9 oracle version #2.8 WA for new hosts&sy #v.2.7 02.06.2020 +kernel +ulimits +nic_drivers +component version, fixed: ora_ver for ballenger&langley #v2.6 14.01.2020: +HP Gen10 support +TimesTen version #v2.5 22.08.2019: + HDD Size and Model. #v2.4 21.08.2019: + Oracle ver. #v2.3 22.03.2019: + HW SNs. #v2.2 20.03.2018: CPU cores + threads fix. VMVARE HW_TYPE support.
+#ver 2.8.6 smal fix #ver 2.8.5 Templates introduced #ver 2.8.4 new storge IBM 5k and backyp-gw #2.8.3.3 output conveyor fixed #2.8.2 +WL, UP and java ver. #fix for LNX6.9 oracle version #2.8 WA for new hosts&sy #v.2.7 02.06.2020 +kernel +ulimits +nic_drivers +component version, fixed: ora_ver for ballenger&langley #v2.6 14.01.2020: +HP Gen10 support +TimesTen version #v2.5 22.08.2019: + HDD Size and Model. #v2.4 21.08.2019: + Oracle ver. #v2.3 22.03.2019: + HW SNs. #v2.2 20.03.2018: CPU cores + threads fix. VMVARE HW_TYPE support.
 if [ ! -n "$1" ]; then 
 	printf "\n Runs Hardware Inventory checks against any Linux-based servers.\n  Usage: ./linux_hw_au.sh HOSTNAME SITE_ID\n   Where:\n     HOSTNAME can be necessary server to run inventory on or mask for the group of hosts from the /etc/hosts\n   	 SITE_ID is optional parameter, will be inserted as first column of output. PROD_SITE is used by default\n  Examples:\n    ./linux_hw_au.sh sgu21b MSK\n    ./linux_hw_au.sh slu EKT\n    ./linux_hw_au.sh sgu23\n\n";
 	exit; 
 fi;
-delat_krasivo=$1; site_id=$2
-lnx_tmplt="^ *#|audit_exclude|farm|blc|slu-dslu|amm|esm|admin|zbx|hsbu|_oob|_ilo|-om|-bb|rctu|cross|old|emc|fcs|_upm|ilo|upm_|vip|nas_console|_hsbn|_sw|-lba"
-if [ ! -n "$2" ]; then site_id=PROD_SITE; fi
+
+host_match=$1; # Hostname to run audit
+
+lnx_ex_tmplt="MY_TEMPLATE";  # Template to exclude hosts from the /etc/hosts of your master node. i.e. grep -viE "template" /etc/hosts; its lnx_ex_tmplt="MY_TEMPLATE" by default.
+if [ "$lnx_ex_tmplt" = "MY_TEMPLATE" ]; then 
+	lnx_ex_tmplt="^ *#|audit_exclude|farm|blc|slu-dslu|amm|esm|admin|zbx|hsbu|_oob|_ilo|-om|-bb|rctu|cross|old|emc|fcs|_upm|ilo|upm_|vip|nas_console|_hsbn|_sw|-lba"; 
+fi
+
+site_id=$2; # SITE_ID for first column
+if [ ! -n "$2" ]; then 
+	site_id=PROD_SITE; 
+fi
+
 printf "SITE |HOSTNAME |IP ADDR |ROUTE |HW TYPE |HW SN |LNX SCORE |KERNEL |HW ARCH |APP VERSION |APP INSTALL DATE(M/D/Y) |UP VERSION |ORA CLI |ORA DB |TT DB |WL VERSION |JAVA VER |RAM |CORES |THREADS |ENA CORES |CPU |HDD SIZE |HDD MODEL |HDD HEALTH |ACTIVE UEFI BANK |UEFI/BIOS VERSION |FILE-MAX (sysctl.conf) |FILE-LIMIT (ulimit -n)|UPTIME |NIC DRVs |EMC MODEL |EMC SERIAL |EMC FLARE |V7k MODEL |V7k TYPE |V7k ENCLOSURE SN |v7K FW |V7k failed HDDs |V7k CONSOLE |V5k MODEL |V5k TYPE |V5k ENCLOSURE SN |v5K FW |V5k failed HDDs |V5k CONSOLE |DD MODEL |DD SERIAL |DD OS |DD DISK STATUS |DD UPTIME \n";
-for host in $(grep -iE $delat_krasivo /etc/hosts|grep -viE "$lnx_tmplt"|awk {'print$2'}|sort|uniq);
+
+# GENERAL LOOP
+for host in $(grep -iE $host_match /etc/hosts|grep -viE "$lnx_ex_tmplt"|awk {'print$2'}|sort|uniq);
 do ping -c1 -W1 $host 1> /dev/null && printf "$site_id |" && ssh -q $host "
 if [ ! -f /tmp/lnx_hw_au.txt ]; then runuser -l oracle '\$ORACLE_HOME/OPatch/opatch' lsinventory 2>/dev/null > /tmp/lnx_hw_au.txt; runuser -l ttuser -c '\$TT_HOME/bin/ttadmin -version' 2>/dev/null >> /tmp/lnx_hw_au.txt; fi
 hostik=\`hostname\` 
