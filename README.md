@@ -24,49 +24,49 @@ URANUS:oam1a:/root# grep audit_exclude /etc/hosts
 
 **2. For IBM v7000** add san_console information into the SDP `/etc/hosts` (both nodes):
 ``` shell
-URANUS-SDP1a:sdp1:/# grep -i san /etc/hosts 
+URANUS-SDP1a:sdp1:/> grep -i san /etc/hosts 
 10.31.184.125 san_console
 10.31.184.138 v7000-1a san1 
 10.31.184.139 v7000-1b san2
 ```
 The san_console is an IBM storage enclosures VIP interface. Which can be obtained from the storage active enclosure node (password-less access setup for SDP_A only):
 ``` shell
-URANUS-SDP1a:sdp1:/# ssh superuser@san_console lssystem | grep console 
+URANUS-SDP1a:sdp1:/> ssh superuser@san_console lssystem | grep console 
 console_IP 10.31.184.125:443
-URANUS-SDP1a:sdp1:/#
+URANUS-SDP1a:sdp1:/>
 ```
 
 **3. For IBM fs900** add san_console_flash information into the SDP `/etc/hosts` (both nodes):
 ``` shell
-URANUS-SDP23:sdp1:/# grep -i san_console /etc/hosts 
+URANUS-SDP23:sdp1:/> grep -i san_console /etc/hosts 
 192.168.89.39 san_storage-23 san1 san_console 
 192.168.89.45 san_flash-23 san2 san_console_flash 
-URANUS-SDP23:sdp1:/#
+URANUS-SDP23:sdp1:/>
 ```
 The san_console_flash is an IBM flash storage enclosures VIP interface. This information can be obtained from the storage active node enclosure (console password-less access setup for SDP_A only by default):
 ``` shell
-URANUS-SDP23:sdp1:/# ssh superuser@san_console_flash lssystem | grep console 
+URANUS-SDP23:sdp1:/> ssh superuser@san_console_flash lssystem | grep console 
 console_IP 192.168.89.45:443
-URANUS-SDP23:sdp1:/#
+URANUS-SDP23:sdp1:/>
 ```
 
 **4. Beware that to some POWER8 SDPs both type of the storages** (v7000 and fs900) can be connected to one SDP server (different VGs are located on different storages). Be sure that you have both `san_console` and `san_console_flash` IP addresses in `/etc/hosts` file on **both SDP_A and SDP_B nodes** for this type of servers.
 
 **5. Double check** that SDP_A `known_hosts` file contains records for new san_console and `san_console_flash` hosts:
 ``` shell
-URANUS-SDP23a:sdp1:/# ssh superuser@san_console 'lssystem'| grep code_level 
+URANUS-SDP23a:sdp1:/> ssh superuser@san_console 'lssystem'| grep code_level 
 code_level 7.8.1.10 (build 135.9.1905291321000)
-URANUS-SDP23a:sdp1:/# ssh superuser@san_console_flash 'lssystem'| grep code_level 
+URANUS-SDP23a:sdp1:/> ssh superuser@san_console_flash 'lssystem'| grep code_level 
 code_level 7.8.1.10 (build 135.9.1905291321000)
-URANUS-SDP23a:sdp1:/#
+URANUS-SDP23a:sdp1:/>
 ```
 
 **6. For CISCO FCS** (Nexus modules only) create special inventory user and configure password-less access for SDP_A node on fcswa and fcswb FCSs:
 ``` shell
-URANUS-SDP23:sdp1:/# grep -i fcsw /etc/hosts 
+URANUS-SDP23:sdp1:/> grep -i fcsw /etc/hosts 
 192.168.89.57 fc-sw23a fcswa fcs23a 
 192.168.89.58 fc-sw23b fcswb fcs23b
-URANUS-SDP23:sdp1:/#
+URANUS-SDP23:sdp1:/>
 ```
 Login from SDP_A node to fcswa as admin user and list all connected users to define correct SDP_A IP address:
 ``` shell
@@ -113,11 +113,11 @@ FCS-23A# exit
 
 Confirm password-less access is configured for both fcswa and fcswb switches from SDP_A node:
 ``` shell
-URANUS-sdp23a:/# ssh -q audit@fcswa 'sh inventory' | head -1 | awk '{print $4,$5}'; 
+URANUS-sdp23a:/> ssh -q audit@fcswa 'sh inventory' | head -1 | awk '{print $4,$5}'; 
 MDS 9148S
-URANUS-sdp23a:/# ssh -q audit@fcswb 'sh inventory' | head -1 | awk '{print $4,$5}'; 
+URANUS-sdp23a:/> ssh -q audit@fcswb 'sh inventory' | head -1 | awk '{print $4,$5}'; 
 MDS 9148S
-sdp23a:/#
+sdp23a:/>
 ```
 
 FULL SITE INVENTORY
@@ -125,7 +125,7 @@ FULL SITE INVENTORY
 To run hardware inventory across all the onsite servers you have to execute `audit.run` script
 as superuser with short site name:
 ``` shell
-URANUS-UPM1a:upm1:# ./audit.run URANUS
+URANUS-UPM1a:upm1:> ./audit.run URANUS
 Keep an eye on the progress. Human input might be required.
    Running HW Inventory on following units:
    SGU, DGU, SLU, DSLU, CRMOMAPP, ... CMVOEM, UPM, UPMDB, OAMAPP, SDP, CPM, WPDB, BF, ADMIN
@@ -133,7 +133,7 @@ Keep an eye on the progress. Human input might be required.
 ```
 For help information - fire `audit.run` without any keys: 
 ``` shell
-URANUS-UPM1a:upm1:# ./audit.run
+URANUS-UPM1a:upm1:> ./audit.run
    Runs Hardware Inventory checks across all onsite units.
 Usage: ./audit.run SITE_ID
 Where SITE_ID is short site name. AIX and LINUX inventory scripts will be updated
@@ -146,24 +146,24 @@ Where SITE_ID is short site name. AIX and LINUX inventory scripts will be update
       aix_hw_au.sh - runs Hardware Inventory checks against any AIX-based servers.
       linux_hw_au.sh - runs Hardware Inventory checks against any Linux-based servers.
 Be aware that SANbox and EMCds FCSs checks is deprecated in this version, as obsolete HW 
-URANUS-UPM1a:upm1:#
+URANUS-UPM1a:upm1:>
 ```
 As a result of this execution you’ll have two .CSV files. First with Linux based servers inventory, second with AIX based servers inventory information:
 ``` shell
-URANUS-UPM1a:upm1:# ls -rlt
+URANUS-UPM1a:upm1:> ls -rlt
 -rwxrwxrwx 1 root root 5319 Jan 21 19:40 audit.run
 -rwxrwxrwx 1 root root 15880 Jan 21 21:32 linux_hw_au.sh 
 -rwxrwxrwx 1 root root 12436 Jan 21 21:32 aix_hw_au.sh
 -rw-r--r-- 1 root root 87596 Jan 21 21:43 URANUS.LINUX_HW_LIST.csv 
 -rw-r--r-- 1 root root 20161 Jan 21 21:47 URANUS.AIX_HW_LIST.csv 
-URANUS-UPM1a:upm1:#
+URANUS-UPM1a:upm1:>
 ```
 Both CSV files will contain all the inventory data with pipe (`|`) symbol used as the columns delimiter:
 ``` shell
-URANUS-UPM1a:upm1:# head -2 YAR.LINUX_HW_LIST.csv
+URANUS-UPM1a:upm1:> head -2 YAR.LINUX_HW_LIST.csv
 SITE |HOSTNAME |IP ADDR |ROUTE |HW TYPE |HW SN |LNX SCORE |KERNEL |HW ARCH |APP VERSION |APP INSTALL DATE(M/D/Y) |UP VERSION |ORA CLI |ORA DB |TT DB |WL VERSION |JAVA VER |RAM |CORES |THREADS |ENA CORES |CPU |HDD SIZE |HDD MODEL |HDD HEALTH |ACTIVE UEFI BANK |UEFI/BIOS VERSION |FILE-MAX (sysctl.conf) |FILE-LIMIT (ulimit -n)|UPTIME |NIC DRVs |EMC MODEL |EMC SERIAL |EMC FLARE |V7k MODEL |V7k TYPE |V7k ENCLOSURE SN |v7K FW |V7k failed HDDs |V7k CONSOLE |DD MODEL |DD SERIAL |DD OS |DD DISK STATUS |DD UPTIME 
 YAR |sgu1a |10.31.184.100 |10.31.184.1 |ProLiant BL460c Gen8 |OLOLO |6.2.1 | 2.6.32-220.el6.i686 |i686 |7.0.5 | Mon Apr 10 2017 |4.120.0 |11.2.0.3.0 |NA |NA |NA | 1.6.0_31 |3983136 |6 |12 |6 |E5-2620Xeon(R) |300.0GB |HP LOGICAL VOLUME |OK |HP NA | 1.51 | 20000 |8192 |327 days |2.1.11 2.7.0.3 1.70.00-0 |NA |NA |NA |NA |NA |NA |NA |NA |NA |NA |NA |NA |NA |
-URANUS-UPM1a:upm1:#
+URANUS-UPM1a:upm1:>
 ```
 
 LINUX HOSTS INVENTORY
@@ -171,7 +171,7 @@ LINUX HOSTS INVENTORY
 To run Hardware Inventory checks against any Linux-based servers you have to execute `linux_hw_au.sh` script.
 For help information, run `linux_hw_au.sh` without any keys:
 ``` shell
-URANUS-UPM1a:upm1:# ./linux_hw_au.sh
+URANUS-UPM1a:upm1:> ./linux_hw_au.sh
    Runs Hardware Inventory checks against any Linux-based servers.
 Usage: ./linux_hw_au.sh HOSTNAME SITE_ID Where:
       HOSTNAME is server to run inventory on or mask for the group of hosts from the /etc/hosts
@@ -181,33 +181,33 @@ Usage: ./linux_hw_au.sh HOSTNAME SITE_ID Where:
       ./linux_hw_au.sh sgu21b URANUS
       ./linux_hw_au.sh slu URANUS_PROD
       ./linux_hw_au.sh sgu23\
-URANUS-UPM1a:upm1:#
+URANUS-UPM1a:upm1:>
 ```
 Once you read all the help, you can execute `linux_hw_au.sh` script as superuser.
 Beware the script will not save any data to .CSV files, it will send all the output, about every server to console:
 ``` shell
-URANUS-UPM1a:upm1:# ./linux_hw_au.sh sgu3 URANUS
+URANUS-UPM1a:upm1:> ./linux_hw_au.sh sgu3 URANUS
   SITE |HOSTNAME |IP ADDR |ROUTE |HW TYPE |HW SN |LNX SCORE |KERNEL |HW ARCH |APP VERSION |APP INSTALL DATE(M/D/Y) |UP VERSION |ORA CLI |ORA DB |TT DB |WL VERSION |JAVA VER |RAM |CORES |THREADS |ENA CORES |CPU |HDD SIZE |HDD MODEL |HDD HEALTH |ACTIVE UEFI BANK |UEFI/BIOS VERSION |FILE-MAX (sysctl.conf) |FILE-LIMIT (ulimit -n)|UPTIME |NIC DRVs |EMC MODEL |EMC SERIAL |EMC FLARE |V7k MODEL |V7k TYPE |V7k ENCLOSURE SN |v7K FW |V7k failed HDDs |V7k CONSOLE |DD MODEL |DD SERIAL |DD OS |DD DISK STATUS |DD UPTIME
  URANUS |sgu3a |192.168.30.1 |10.4.18.1 |DPM3 PFS-379/380 |See IPMI FRU |5.4 |2.6.18-164.2.1.el5PAE |i686 |6.0.2 | Thu Dec 15 2011 |4.100.0 |10.2.0.3.0 |10.2.0.3.0 |NA |NA |1.4.2 |4019116 |2 |2 |NA |T7400Core(TM)2 |120.0GB | |NA |DPM3 NA |1.00.08 |8192 |8192 |1155 days |1.9.3 2.0.1e 1.48.105 |NA |NA |NA |NA |NA |NA |NA |NA |NA |NA |NA |NA |NA |
  URANUS |sgu3b |192.168.30.2 |10.4.18.1 |DPM3 PFS-379/380 |See IPMI FRU |5.4 |2.6.18-164.2.1.el5PAE |i686 |6.0.2 | Thu Dec 15 2011 |4.100.0 |10.2.0.3.0 |10.2.0.3.0 |NA |NA |1.4.2 |4019116 |2 |2 |NA |T7400Core(TM)2 |120.0GB | |NA |DPM3 NA |1.00.08 |8192 |8192 |233 days |1.9.3 2.0.1e 1.48.105 |NA |NA |NA |NA |NA |NA |NA |NA |NA |NA |NA |NA |NA |
 ```
 You can print necessary inventory data only:
 ``` shell
-URANUS-UPM1a:upm1:# ./linux_hw_au.sh urp | awk -F '|' '{print $2"|"$5"|"$6}' 
+URANUS-UPM1a:upm1:> ./linux_hw_au.sh urp | awk -F '|' '{print $2"|"$5"|"$6}' 
 HOSTNAME |HW TYPE                 |HW SN
     urp1 |IBM eServer BladeCenter |OLOLO
     urp2 |IBM eServer BladeCenter |OLOLO1
     urp3 |DPM3 PFS-379/380        |See IPMI FRU
-URANUS-UPM1a:upm1:#
+URANUS-UPM1a:upm1:>
 ```
 Or forward output into the file for further analysis:
 ``` shell
-CSCOM-UPM1a:upm1:# ./linux_hw_au.sh dslu URANUS > URANUS.LINUX.`date +’%d.%m.%Y'`.csv 
-CSCOM-UPM1a:upm1:# ls -lrt *.csv
+CSCOM-UPM1a:upm1:> ./linux_hw_au.sh dslu URANUS > URANUS.LINUX.`date +’%d.%m.%Y'`.csv 
+CSCOM-UPM1a:upm1:> ls -lrt *.csv
 -rw-r--r-- 1 root root 6310 Jan 20 22:36 URANUS.LINUX.20.01.2015.csv 
-URANUS-UPM1a:upm1:# wc -l URANUS.LINUX.20.01.2015.csv
+URANUS-UPM1a:upm1:> wc -l URANUS.LINUX.20.01.2015.csv
 42 URANUS.LINUX.20.01.2015.csv
-URANUS-UPM1a:upm1:#
+URANUS-UPM1a:upm1:>
 ```
 
 AIX HOSTS INVENTORY
@@ -215,7 +215,7 @@ AIX HOSTS INVENTORY
 To run Hardware Inventory checks against any Linux-based servers you have to execute `aix_hw_au.sh` script.
 For help information, run `aix_hw_au.sh` without any keys:
 ``` shell
-URANUS-UPM1a:upm1:# ./aix_hw_au.sh
+URANUS-UPM1a:upm1:> ./aix_hw_au.sh
    Runs Hardware Inventory checks against any AIX-based servers.
 Usage: ./aix_hw_au.sh HOSTNAME SITE_ID Where:
       HOSTNAME is server to run inventory on or mask for the group of hosts from the /etc/hosts
@@ -225,33 +225,33 @@ Usage: ./aix_hw_au.sh HOSTNAME SITE_ID Where:
       ./aix_hw_au.sh sdp1b URANUS
       ./aix_hw_au.sh sdp URANUS_PROD
       ./aix_hw_au.sh URANUS_TEST
-URANUS-UPM1a:upm1:#
+URANUS-UPM1a:upm1:>
 ```
 Once you read all the help, you can execute `aix_hw_au.sh` script as superuser. Beware the script will not save any data to .CSV files, it will send all the output, about every server to console:
 ``` shell
-URANUS-UPM1a:upm1:# ./aix_hw_au.sh sdp1 URANUS
+URANUS-UPM1a:upm1:> ./aix_hw_au.sh sdp1 URANUS
   SITE |HOSTNAME |HW TYPE |SYSTEM MODEL |SERIAL |NGSCORE |DBCORE |ORACLE DB |ORACLE CLI |UP VERSION |JAVA VERSION |FIRMWARE |AIX OS LEVEL |BLU MODEL |BLU SERIAL |NSR LICENSE EXP |NETWORKER VERSION |FCSWA MODEL |FCSWA SN |FCSWA FW LEVEL |FCSWB MODEL |FCSWA SN |FCSWB FW LEVEL |EMC MODEL |EMC SERIAL |EMC FLARE |V7k MODEL |V7k TYPE |V7k ENCLOSURE SN |v7K FW |V7k failed HDDs |V7k CONSOLE |V7k2F MODEL |V7k2F TYPE |V7k2F ENCLOSURE SN |v7K2F FW |V7k2F failed SSDs |V7k2F CONSOLE |CLUST IP |NODE IP |HMC IP |LPAR INFO |AUTO RESTART |CPU CLOCK |NUM OF CPU |RAM SIZE |GOOD RAM SIZE |NUM OF RAM MODULES |SIZE OF RAM MODULES(MB) |PAGE SIZE |COUNT ERRPT | UNIQ ERRPT |UPTIME |
 URANUS |sdp1a |POWER8 |IBM,8284-22A |OLOLO |V7.2.4 |4.56.0 |11.2.0.4.191015 |Not installed |Not installed |not |sys0!system:SV860_205 (t) SV860_205 (p) SV860_205 (t) |7200-03-03-1913 |IBMULT3580-HH7 |116B2DE05B |No Exp Date |NA| | | | | | |NA |NA |NA |NA |NA |NA |NA |       0  |NA |IBM FlashSystem 900 |control 9843-AE3  |13BG06X  |1.6.1.0 |0  |10.4.21.122:443 |10.4.19.138 | |NA|1 78-D13BX |true |3891 MHz |12 |253952 MB |253952 MB |8 |0032768 0032768 0032768 0032768 0032768 0032768 0032768 0032768  |s 4 KB m 64 KB  |32 |1 |329days |
 URANUS |sdp1b |POWER8 |IBM,8284-22A |OLOLO |V7.2.4 |Not there |11.2.0.4.191015 |Not installed |Not installed |not |sys0!system:SV860_205 (t) SV860_205 (p) SV860_205 (t) |7200-03-03-1913 |IBMULT3580-HH7 |116B2DE05B |No Exp Date | | same as on node A |same as on node A | |same as on node A |same as on node A | |NA |NA |NA |same as on node A |same as on node A |same as on node A |same as on node A |same as on node A |same as on node A |same as on node A |same as on node A |same as on node A |same as on node A |same as on node A |same as on node A |10.4.19.138 | |NA|1 78-D13CX |true |3891 MHz |12 |253952 MB |253952 MB |8 |0032768 0032768 0032768 0032768 0032768 0032768 0032768 0032768 |s 4 KBm64KB |32|1|329days|
-URANUS-UPM1a:upm1:#
+URANUS-UPM1a:upm1:>
 ```
 You can print necessary inventory data only:
 ``` shell
-upm1:# ./aix_hw_au.sh sdp | awk -F '|' '{print $2"|"$3"|"$44"|"$45"|"$46}' 
+upm1:> ./aix_hw_au.sh sdp | awk -F '|' '{print $2"|"$3"|"$44"|"$45"|"$46}' 
 HOSTNAME |HW TYPE |CPU CLOCK |NUM OF CPU |RAM SIZE
 sdp1a    |POWER8  |3891 MHz  |12         |253952 MB
 ...
 sdp9b    |POWER8  |3891 MHz  |6          |186624 MB
-URANUS-UPM1a:upm1:#
+URANUS-UPM1a:upm1:>
 ```
 Or forward output into the file for further analysis:
 ``` shell
-URANUS-UPM1a:upm1:# ./aix_hw_au.sh sdp URANUS > URANUS.AIX.`date +’%d.%m.%Y'`.csv 
-URANUS-UPM1a:upm1:# ls -lrt *.csv
+URANUS-UPM1a:upm1:> ./aix_hw_au.sh sdp URANUS > URANUS.AIX.`date +’%d.%m.%Y'`.csv 
+URANUS-UPM1a:upm1:> ls -lrt *.csv
 -rw-r--r-- 1 root root 6310 Jan 20 22:43 URANUS.AIX.20.01.2015.csv 
-URANUS-UPM1a:upm1:# wc -l URANUS.AIX.20.01.2015.csv
+URANUS-UPM1a:upm1:> wc -l URANUS.AIX.20.01.2015.csv
 14 URANUS.AIX.20.01.2015.csv
-URANUS-UPM1a:upm1:#
+URANUS-UPM1a:upm1:>
 ```
 
 HOW TO IMPORT .CSV Inventory file into EXCEL
