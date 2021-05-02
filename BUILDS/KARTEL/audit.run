@@ -8,7 +8,14 @@ if [ ! -n "$1" ]; then
 fi;
 SITE_NAME=$1
 #SITE FIX
-sed -i "s/PROD_SITE/$SITE_NAME/g" linux_hw_au.sh; sed -i "s/PROD_SITE/$SITE_NAME/g" aix_hw_au.sh;
+sed -i "s/PROD_SITE/$SITE_NAME/g" linux_hw_au.sh; 
+sed -i "s/PROD_SITE/$SITE_NAME/g" aix_hw_au.sh;
+#HOST TEMPLATE FIX
+lnx_ex_tmplt="^ *#|audit_exclude|farm|blc|slu-dslu|amm|esm|admin|zbx|hsbu|_oob|_ilo|-om|-bb|rctu|cross|old|emc|fcs|_upm|ilo|upm_|vip|nas_console|_hsbn|_sw|-lba" # SITE SPECIFIC TEMPLATE FOR KARTEL
+sed -i "s/MY_TEMPLATE\";/$lnx_ex_tmplt\"/g" linux_hw_au.sh;
+aix_ex_tmplt="^ *#|audit_exclude|localhost|farm|blu|acmi|admin|emc|v7000|om|hmc|fcs|emc|tape|asmi|zbx|hsbu|mau|rctu" # SITE SPECIFIC TEMPLATE FOR KARTEL
+sed -i "s/MY_TEMPLATE\";/$aix_ex_tmplt\"/g" aix_hw_au.sh;
+
 #Temp script for FEADMIN and UPM/OAM unites:
 yes | cp -p linux_hw_au.sh fead.tmp.sh; sed -i "s/admin|//g" fead.tmp.sh; sed -i "s/vip|//g" fead.tmp.sh; sed -i "s/-bb|//g" fead.tmp.sh; 
 #LINUX COLLECT

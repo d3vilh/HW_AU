@@ -1,0 +1,1 @@
+../../linux_hw_au.sh
