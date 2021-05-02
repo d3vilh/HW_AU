@@ -5,10 +5,15 @@ Runs audit for all AIX and Linux servers in /etc/hosts of your master node and p
 MAIN FEATURES
 --------------
 Fast and easy to setup.
+
 Require minimal system resources.
+
 Does not require 3rd party software to run.
+
 VM and BM compatible.
-* The Inventory utility provides following information:
+
+The Inventory utility provides following information:
+
 * Server hardware parts report (CPU, RAM, HDD, PCI boards)
 * Server Serial Numbers report (Server MB, Storage, Fiber Switches, Tape Libs)
 * Server Firmware versions (BIOS, UEFI, NIC, POWER servers)
