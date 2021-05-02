@@ -1,0 +1,42 @@
+#!/bin/bash
+#UCELL CV ONLY!
+#Philipp 11.01.2021
+#v.1.0 LINUX and AIX
+if [ ! -n "$1" ]; then 
+	printf "\n Runs Hardware Inventory checks across all onsite units.\n  Usage: ./audit.run SITE_ID\n    Where SITE_ID is short site name. AIX and LINUX inventory scripts will be updated with this short name on first audit.run execution.\n  Examples:\n    ./audit.run UCELL\n    ./audit.run UCELL_PROD\n    ./audit.run UCELL_TEST\n  Prerequisites:\n    aix_hw_au.sh - runs Hardware Inventory checks against any AIX-based servers.\n    linux_hw_au.sh - runs Hardware Inventory checks against any Linux-based servers.\n\n  Be aware that SANbox and EMCds FCSs checks is depricated in this version, as obsolete HW\n\n";
+	exit; 
+fi;
+SITE_NAME=$1
+#SITE FIX
+sed -i "s/PROD_SITE/$SITE_NAME/g" linux_hw_au.sh; sed -i "s/PROD_SITE/$SITE_NAME/g" aix_hw_au.sh;
+#Temp script for FEADMIN and UPM/OAM unites:
+yes | cp -p linux_hw_au.sh fead.tmp.sh; sed -i "s/admin|//g" fead.tmp.sh; 
+#LINUX COLLECT
+printf "\n Keep an eye on the progress. Human input might be required.\n\n Running HW Inventory on following units: \n SGU, DGU, SLU, DSLU, ECI, NOTIF, ORP, URP, SAPI, RHT, ASYNCH, FEADMIN, CCS, CMS, CRMOMAPP, ASU, CMVOEM, UPM, UPMDB, OAMAPP, SDP, CPM, WPDB, BF, ADMIN\n"; 
+printf ' PROGRESS: 1%%   [#.............................................] RUNNING ON: SGU\r'; ./linux_hw_au.sh sgu > $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 5%%   [##............................................] RUNNING ON: DGU\r'; ./linux_hw_au.sh dgu|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 10%%  [####..........................................] RUNNING ON: SLU&DSLU\r'; ./linux_hw_au.sh slu|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 15%%  [######........................................] RUNNING ON: ECI     \r'; ./linux_hw_au.sh eci|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 19%%  [########......................................] RUNNING ON: NOTIF   \r'; ./linux_hw_au.sh notif|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 23%%  [##########....................................] RUNNING ON: ORP     \r'; ./linux_hw_au.sh orp|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 25%%  [############..................................] RUNNING ON: URP     \r'; ./linux_hw_au.sh urp|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 29%%  [##############................................] RUNNING ON: SAPI    \r'; ./linux_hw_au.sh sapi|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 30%%  [################..............................] RUNNING ON: RHT     \r'; ./linux_hw_au.sh rht|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 35%%  [##################............................] RUNNING ON: ASYNCH  \r'; ./linux_hw_au.sh asynch|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 40%%  [####################..........................] RUNNING ON: FEADMIN \r'; ./fead.tmp.sh feadmin|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 45%%  [######################........................] RUNNING ON: CCS     \r'; ./linux_hw_au.sh ccs|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 50%%  [########################......................] RUNNING ON: CMS     \r'; ./linux_hw_au.sh cms|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 55%%  [##########################....................] RUNNING ON: CRMOMAPP\r'; ./linux_hw_au.sh crmomapp|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 60%%  [############################..................] RUNNING ON: ASU     \r'; ./linux_hw_au.sh asu|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 65%%  [##############################................] RUNNING ON: CMVOEM  \r'; ./linux_hw_au.sh cmvoem|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 70%%  [################################..............] RUNNING ON: UPM&DB  \r'; ./fead.tmp.sh upm|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 75%%  [##################################............] RUNNING ON: OAMAPP  \r'; ./linux_hw_au.sh oamapp|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+yes | rm fead.tmp.sh #cleanup of tmp file
+#AIX COLLECT
+printf ' PROGRESS: 80%%  [####################################..........] RUNNING ON: SDP     \r'; ./aix_hw_au.sh sdp |grep -v FILE-MAX > $SITE_NAME.AIX_HW_LIST.csv;
+printf ' PROGRESS: 85%%  [######################################........] RUNNING ON: CPM     \r'; ./aix_hw_au.sh cpm |grep -v FILE-MAX >> $SITE_NAME.AIX_HW_LIST.csv;
+printf ' PROGRESS: 90%%  [########################################......] RUNNING ON: WPDB    \r'; ./aix_hw_au.sh wpdb |grep -v FILE-MAX >> $SITE_NAME.AIX_HW_LIST.csv;
+printf ' PROGRESS: 93%%  [##########################################....] RUNNING ON: BF      \r'; ./aix_hw_au.sh bf |grep -v FILE-MAX >> $SITE_NAME.AIX_HW_LIST.csv;
+printf ' PROGRESS: 96%%  [############################################..] RUNNING ON: ADMIN   \r'; ./aix_hw_au.sh blus |grep -v FILE-MAX >> $SITE_NAME.AIX_HW_LIST.csv;
+printf " COMPLETED 100%% [##############################################] `date +'%H:%M:%S %d.%m.%Y'`       \r\n\n";
+#EOShit-codding
