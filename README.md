@@ -23,7 +23,7 @@ The Inventory utility provides following information:
 * Server uptime, Limits, MEM Pages and TZ settings
 * Running C1 and 3rd party applications version (CBS apps, UPA, Oracle, Java, WebLogic) Advanced Storage report (for EMC CX, DATA Domain, IBM v7000 and IBM fs900) Advanced FCS report (CISCO Nexus)
 * Core Network switches inventory (Juniper and Cisco switches)
-* _Servers Network configuration snapshot (AIX and Linux. MAC, IP, Routing, VIP)_
+* _Servers Network configuration snapshot (AIX and Linux. MAC, IP, Routing, VIP)._ Available [here](https://github.com/d3vilh/NET_AU)
 
 PREREQUISITES
 --------------
