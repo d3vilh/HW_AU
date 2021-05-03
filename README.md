@@ -43,7 +43,7 @@ CELCO:oam1a:/root# grep audit_exclude /etc/hosts
 10.1.1.112 upmdb upmdb_vip #audit_exclude
 10.1.1.112 EM_REPOSITORY orac-upmdb upmdb #audit_exclude
 ```
-**FOR BASIC INVENTORY** - skip preparation for IBM Storages and CISCO FCSs
+**FOR BASIC INVENTORY** - skip preparation and go to next step - [FULL SITE INVENTORY](https://github.com/d3vilh/HW_AU#full-site-inventory)
 
 **2. For IBM v7000** add san_console information into the SDP `/etc/hosts` (both nodes):
 ``` shell
