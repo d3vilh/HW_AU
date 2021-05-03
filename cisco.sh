@@ -45,7 +45,6 @@ fi
 done
 #that's all folks
 
-# EN syg5%6^7 
 #username Netadmn9 privilege 15     
 #ip domain-name HSBU
 #crypto key generate rsa    #1024

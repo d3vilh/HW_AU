@@ -1,5 +1,5 @@
-Hardware Audit tool for Comverse One systems.
-=============================================
+Hardware Inventory audit tool for Comverse One systems.
+=======================================================
 Runs audit for all AIX and Linux servers in /etc/hosts of your master node and provides CSV file with all the details as result. 
 
 MAIN FEATURES
@@ -23,7 +23,7 @@ The Inventory utility provides following information:
 * Server uptime, Limits, MEM Pages and TZ settings
 * Running C1 and 3rd party applications version (CBS apps, UPA, Oracle, Java, WebLogic) Advanced Storage report (for EMC CX, DATA Domain, IBM v7000 and IBM fs900) Advanced FCS report (CISCO Nexus)
 * Core Network switches inventory (Juniper and Cisco switches)
-* Servers Network configuration snapshot (AIX and Linux. MAC, IP, Routing, VIP)
+* _Servers Network configuration snapshot (AIX and Linux. MAC, IP, Routing, VIP)_
 
 PREREQUISITES
 --------------
@@ -185,7 +185,7 @@ Both CSV files will contain all the inventory data with pipe (`|`) symbol used a
 ``` shell
 CELCO-UPM1a:upm1:# head -2 YAR.LINUX_HW_LIST.csv
 SITE |HOSTNAME |IP ADDR    |ROUTE    |HW TYPE              |HW SN |LNX SCORE |KERNEL               |HW ARCH |APP VERSION |APP INSTALL DATE(M/D/Y) |UP VERSION |ORA CLI    |ORA DB |TT DB |WL VERSION |JAVA VER  |RAM     |CORES |THREADS |ENA CORES |CPU            |HDD SIZE |HDD MODEL         |HDD HEALTH |ACTIVE UEFI BANK |UEFI/BIOS VERSION |FILE-MAX (sysctl.conf) |FILE-LIMIT (ulimit -n)|UPTIME   |NIC DRVs                 |EMC MODEL |EMC SERIAL |EMC FLARE |V7k MODEL |V7k TYPE |V7k ENCLOSURE SN |v7K FW |V7k failed HDDs |V7k CONSOLE |DD MODEL |DD SERIAL |DD OS |DD DISK STATUS |DD UPTIME 
-YAR  |sgu1a    |10.1.1.100 |10.1.1.1 |ProLiant BL460c Gen8 |OLOLO |6.2.1     | 2.6.32-220.el6.i686 |i686    |7.0.5       | Mon Apr 10 2017        |4.120.0    |11.2.0.3.0 |NA     |NA    |NA         | 1.6.0_31 |3983136 |6     |12      |6         |E5-2620Xeon(R) |300.0GB  |HP LOGICAL VOLUME |OK         |HP NA            | 1.51             | 20000                 |8192                  |327 days |2.1.11 2.7.0.3 1.70.00-0 |NA        |NA         |NA        |NA        |NA       |NA               |NA     |NA              |NA          |NA       |NA        |NA    |NA             | NA
+CELCO|sgu1a    |10.1.1.100 |10.1.1.1 |ProLiant BL460c Gen8 |OLOLO |6.2.1     | 2.6.32-220.el6.i686 |i686    |7.0.5       | Mon Apr 10 2017        |4.120.0    |11.2.0.3.0 |NA     |NA    |NA         | 1.6.0_31 |3983136 |6     |12      |6         |E5-2620Xeon(R) |300.0GB  |HP LOGICAL VOLUME |OK         |HP NA            | 1.51             | 20000                 |8192                  |327 days |2.1.11 2.7.0.3 1.70.00-0 |NA        |NA         |NA        |NA        |NA       |NA               |NA     |NA              |NA          |NA       |NA        |NA    |NA             | NA
 CELCO-UPM1a:upm1:#
 ```
 
@@ -291,15 +291,15 @@ CELCO-UPM1a:upm1:#
 
 CISCO SWITCHES INVENTORY
 ------------------------
-TBD
+Scripts are ready to use (`cisco.sh`). Manual - TBD
 
 JUNIPER SWITCHES INVENTORY
 --------------------------
-TBD
+Scripts are ready to use (`juniper.sh`). Manual - TBD
 
 **Known issues:**
- * Junos 12.3R4.6 not compatible for Junos $base_os version get. You have to upgrade Junos
- * QFX switches returns "not valid not valid" for $boot_from - this is normal as per QFX hardware design
+ * Junos 12.3R4.6 not compatible for Junos `$base_os` version get. You have to upgrade Junos
+ * QFX switches returns "not valid not valid" for `$boot_from` - this is normal as per QFX hardware design
  * If script does not retrieve all the vars - set `system services ssh rate-limit 50` on your Juniper
 
 HOW TO IMPORT .CSV Inventory file into EXCEL
