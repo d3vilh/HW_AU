@@ -4,13 +4,13 @@ Runs audit for all AIX and Linux servers in /etc/hosts of your master node and p
 
 MAIN FEATURES
 --------------
-Fast and easy to setup.
+* Fast and easy to setup.
 
-Require minimal system resources.
+* Require minimal system resources.
 
-Does not require 3rd party software to run.
+* Does not require 3rd party software to run.
 
-VM and BM compatible.
+* VM and BM compatible.
 
 The Inventory utility provides following information:
 
@@ -41,7 +41,8 @@ The scripts uses special filters to avoid running inventory on the same host sev
 ``` shell
 CELCO:oam1a:/root# grep audit_exclude /etc/hosts 
 10.1.1.112 upmdb upmdb_vip #audit_exclude
-10.1.1.112 EM_REPOSITORY orac-upmdb upmdb #audit_exclude
+10.1.1.113 ORACLE_RAC orac-upmdb upmdb #audit_exclude
+10.1.1.234 BitCoin1 miner1 #audit_exclude 
 ```
 **FOR BASIC INVENTORY** - skip preparation and go to next step - [FULL SITE INVENTORY](https://github.com/d3vilh/HW_AU#full-site-inventory)
 
