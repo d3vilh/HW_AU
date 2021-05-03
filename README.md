@@ -291,11 +291,11 @@ CELCO-UPM1a:upm1:#
 
 CISCO SWITCHES INVENTORY
 ------------------------
-Scripts are ready to use (`cisco.sh`). Manual - TBD
+Scripts are ready to use (`cisco_hw_au.sh`). Manual - TBD
 
 JUNIPER SWITCHES INVENTORY
 --------------------------
-Scripts are ready to use (`juniper.sh`). Manual - TBD
+Scripts are ready to use (`juniper_hw_au.sh`). Manual - TBD
 
 **Known issues:**
  * Junos 12.3R4.6 not compatible for Junos `$base_os` version get. You have to upgrade Junos
