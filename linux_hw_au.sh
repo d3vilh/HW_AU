@@ -72,31 +72,31 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id |" && ssh -q $host "
 				 cur_fw=\`dmidecode | grep -i 'Firmware Revision' | awk '{print \$3}'| tr -d '\n'\`; 
 				 r_hw_type=\`dmidecode | grep 'Product Name' | awk '{print \$3,\$4,\$5}'| tr -d '\n'\`; 
 				 hdd_size=\`fdisk -l /dev/sda 2>/dev/null | grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
-				 hdd_model=\`smartctl -a -d cciss,0 /dev/cciss/c0d0| grep 'Device:' | awk '{print \$2,\$3}'|tr -d '\n'\`; 
-				 if [[ -z \$hdd_model ]]; then 
-				 	hdd_model=\`smartctl -a /dev/sda 2>/dev/null | grep 'Product:' | awk '{print \"HP\",\$2,\$3}'|tr -d '\n'\`; 
-				 fi; 
-				 if [[ -z \$hdd_model ]]; then 
-					hdd_model=\`smartctl -a /dev/sda 2>/dev/null| grep 'Device:' | awk '{print \"HP\",\$3,\$4}'|tr -d '\n'\`; 
-				 fi; 
-				 hdd_heal=\`smartctl -a -d cciss,0 /dev/cciss/c0d0  2>/dev/null| grep 'Health' |awk '{print \$NF}'|tr -d '\n'\`; 
-				 if [[ -z \$hdd_heal ]]; then 
-					hdd_heal=\`smartctl -a /dev/sda 2>/dev/null| grep 'Health' |awk '{print \$NF}'|tr -d '\n'\`; 
-				 fi; 
+				 hdd_model=\`smartctl -a -d cciss,0 /dev/cciss/c0d0| grep 'Device:' | awk '{print \$2,\$3}'|tr -d '\n'\`;
+				 hdd_heal=\`smartctl -a -d cciss,0 /dev/cciss/c0d0  2>/dev/null| grep 'Health' |awk '{print \$NF}'|tr -d '\n'\`;
+				 	if [[ -z \$hdd_model ]]; then 
+				 		hdd_model=\`smartctl -a /dev/sda 2>/dev/null | grep 'Product:' | awk '{print \"HP\",\$2,\$3}'|tr -d '\n'\`; 
+				 	fi; 
+					 if [[ -z \$hdd_model ]]; then 
+						hdd_model=\`smartctl -a /dev/sda 2>/dev/null| grep 'Device:' | awk '{print \"HP\",\$3,\$4}'|tr -d '\n'\`; 
+					 fi;  
+					 if [[ -z \$hdd_heal ]]; then 
+						hdd_heal=\`smartctl -a /dev/sda 2>/dev/null| grep 'Health' |awk '{print \$NF}'|tr -d '\n'\`; 
+					 fi; 
 		;;
 		ProLiant ) r_hw_sn=\`dmidecode | grep -A3 -i 'Product Name' | grep Serial | awk '{print \$3}'| tr -d '\n'\`; 
 				   cur_fw_bank=\`printf \"HP NA\"\`; 
 				   cur_fw=\`dmidecode | grep -i 'Firmware Revision' | awk '{print \$3}'| tr -d '\n'\`; 
 				   r_hw_type=\`dmidecode | grep 'Product Name' | awk '{print \$3,\$4,\$5}'| tr -d '\n'\`; 
 				   hdd_size=\`fdisk -l 2>/dev/null | grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
-				   hdd_model=\`smartctl -a -d cciss,0 /dev/cciss/c0d0| grep 'Device:' | awk '{print \$2,\$3}'|tr -d '\n'\`; 
-				   if [[ -z \$hdd_model ]]; then 
+				   hdd_model=\`smartctl -a -d cciss,0 /dev/cciss/c0d0| grep 'Device:' | awk '{print \$2,\$3}'|tr -d '\n'\`;
+				   hdd_heal=\`smartctl -a -d cciss,0 /dev/cciss/c0d0  2>/dev/null| grep 'Health' |awk '{print \$NF}'|tr -d '\n'\`;
+				   	if [[ -z \$hdd_model ]]; then 
 				   		hdd_model=\`smartctl -a /dev/sda 2>/dev/null| grep 'Device:' | awk '{print \$2 \$3}'|tr -d '\n'\`; 
-				   fi; 
-				   hdd_heal=\`smartctl -a -d cciss,0 /dev/cciss/c0d0  2>/dev/null| grep 'Health' |awk '{print \$NF}'|tr -d '\n'\`; 
-				   if [[ -z \$hdd_heal ]]; then 
+				  	fi; 
+				  	if [[ -z \$hdd_heal ]]; then 
 				   		hdd_heal=\`smartctl -a /dev/sda  2>/dev/null| grep 'Health' |awk '{print \$NF}'|tr -d '\n'\`; 
-				   fi; 
+				  	fi; 
 		;;	
 		HPE ) r_hw_sn=\`dmidecode | grep -A4 'System Information' | grep Serial | awk '{print \$3}'| tr -d '\n'\`; 
 			  cur_fw_bank=\`printf \"HP NA\"\`;
@@ -105,13 +105,13 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id |" && ssh -q $host "
 			  r_hw_type=\`dmidecode | grep -A4 'System Information' | grep 'Product Name' | awk '{print \$3,\$4,\$5}'| tr -d '\n'\`; 
 			  hdd_size=\`fdisk -l 2>/dev/null | grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
 			  hdd_model=\`smartctl -a -d cciss,0 /dev/cciss/c0d0| grep 'Device:' | awk '{print \$2,\$3}'|tr -d '\n'\`; 
-			  if [[ -z \$hdd_model ]]; then 
-					hdd_model=\`smartctl -a /dev/sda | grep -E 'Vendor|Product' |awk '{print \$NF}' |tr '\n' ' '|tr -d '\n'\`; 
-			  fi; 
 			  hdd_heal=\`smartctl -a -d cciss,0 /dev/cciss/c0d0| grep 'Health' |awk '{print \$NF}'|tr -d '\n'\`; 
-			  if [[ -z \$hdd_heal ]]; then 
+			  	if [[ -z \$hdd_model ]]; then 
+					hdd_model=\`smartctl -a /dev/sda | grep -E 'Vendor|Product' |awk '{print \$NF}' |tr '\n' ' '|tr -d '\n'\`; 
+			  	fi; 
+			  	if [[ -z \$hdd_heal ]]; then 
 			  		hdd_heal=\`smartctl -a /dev/sda | grep 'Health' |awk '{print \$NF}'|tr -d '\n'\`; 
-			  fi; 
+			  	fi; 
 		;;	
 		LANGLEY4 ) runuser -l oracle8 '\$ORACLE_HOME/OPatch/opatch lsinventory' 2>/dev/null > /tmp/lnx_hw_au.txt; 
 				   hdd_size=\`fdisk -l /dev/sda 2>/dev/null | grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 

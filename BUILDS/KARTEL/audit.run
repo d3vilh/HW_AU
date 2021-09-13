@@ -26,6 +26,7 @@ printf ' PROGRESS: 16%% [########...........................................] RU
 printf ' PROGRESS: 30%% [###############....................................] RUNNING ON: ECI\r'; ./linux_hw_au.sh eci|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
 printf ' PROGRESS: 38%% [###################................................] RUNNING ON: NOTIF\r'; ./linux_hw_au.sh notif|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
 printf ' PROGRESS: 44%% [######################.............................] RUNNING ON: OFR  \r'; ./linux_hw_au.sh ofr|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 44%% [######################.............................] RUNNING ON: ORP  \r'; ./linux_hw_au.sh orp|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
 printf ' PROGRESS: 50%% [#########################..........................] RUNNING ON: SAPI \r'; ./linux_hw_au.sh sapi|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
 printf ' PROGRESS: 60%% [##############################.....................] RUNNING ON: AJMS \r'; ./linux_hw_au.sh ajms|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
 printf ' PROGRESS: 66%% [#################################..................] RUNNING ON: FEADMIN\r'; ./fead.tmp.sh feadmin|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
