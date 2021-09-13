@@ -4,7 +4,7 @@ Runs audit for all AIX and Linux servers in /etc/hosts of your master node and p
 
 UPDATES
 --------
-* v.0.1.2 13.09.2021 AIX UAC Expiration date report 
+* **v.0.1.2** 13.09.2021 AIX UAC Expiration date report 
 
 MAIN FEATURES
 --------------
