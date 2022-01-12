@@ -1,6 +1,6 @@
 #!/bin/bash
 #Shilov 2015
-#v.0.1.1 new GIT versioning #ver 2.8.7 fix for runuser #ver 2.8.6 smal fix #ver 2.8.5 Templates introduced #ver 2.8.4 new storge IBM 5k and backyp-gw #2.8.3.3 output conveyor fixed #2.8.2 +WL, UP and java ver. #fix for LNX6.9 oracle version #2.8 WA for new hosts&sy #v.2.7 02.06.2020 +kernel +ulimits +nic_drivers +component version, fixed: ora_ver for ballenger&langley #v2.6 14.01.2020: +HP Gen10 support +TimesTen version #v2.5 22.08.2019: + HDD Size and Model. #v2.4 21.08.2019: + Oracle ver. #v2.3 22.03.2019: + HW SNs. #v2.2 20.03.2018: CPU cores + threads fix. VMVARE HW_TYPE support.
+#v.0.1.2 Inventory file introduced #v.0.1.1 new GIT versioning #ver 2.8.7 fix for runuser #ver 2.8.6 smal fix #ver 2.8.5 Templates introduced #ver 2.8.4 new storge IBM 5k and backyp-gw #2.8.3.3 output conveyor fixed #2.8.2 +WL, UP and java ver. #fix for LNX6.9 oracle version #2.8 WA for new hosts&sy #v.2.7 02.06.2020 +kernel +ulimits +nic_drivers +component version, fixed: ora_ver for ballenger&langley #v2.6 14.01.2020: +HP Gen10 support +TimesTen version #v2.5 22.08.2019: + HDD Size and Model. #v2.4 21.08.2019: + Oracle ver. #v2.3 22.03.2019: + HW SNs. #v2.2 20.03.2018: CPU cores + threads fix. VMVARE HW_TYPE support.
 if [ ! -n "$1" ]; then 
 	printf "\n Runs Hardware Inventory checks against any Linux-based servers.\n  Usage: ./linux_hw_au.sh HOSTNAME SITE_ID\n   Where:\n     HOSTNAME can be necessary server to run inventory on or mask for the group of hosts from the /etc/hosts\n   	 SITE_ID is optional parameter, will be inserted as first column of output. PROD_SITE is used by default\n  Examples:\n    ./linux_hw_au.sh sgu21b MSK\n    ./linux_hw_au.sh slu EKT\n    ./linux_hw_au.sh sgu23\n\n";
 	exit; 
@@ -18,10 +18,19 @@ if [ ! -n "$2" ]; then
 	site_id=PROD_SITE; 
 fi
 
+#File with hosts inventory. Can be /etc/hosts or similar, but sorted, wo duplicated entries.
+inventory_file=inventory.$site_id 
+
+if [ ! -e $inventory_file ] ; then
+    printf ' Site inventory file is empty!\n Update Site inventory with necessary IP list and run audit again.\n'
+    printf "#$site_id INVENTORY FILE\n#V.01\n#Used to run HW INVENTORY AUDIT\n\n### UPM/OAM ###\n256.256.256.256 upm1a_example\n256.256.256.257 upmdb1a_example\n256.256.256.258 oam1a_example\n\n### SDP ###\n\n### RCS ###\n\n### SGU ###\n\n### SLU ###\n\n### OSA ###\n\n### ECI ###\n\n### NOTIF ###\n\n### OFR ###\n\n### SAPI/AJMS/FEADMIN ###\n\n### DTR ###\n\n### SYSRV ###\n\n### NASGW ###\n\n### VCENTER ###\n\n### CISCO JUNIPER ARUBA ###\n\n### LBA ###\n\n### MAU ###\n\n### OTHER ###\n\n" > inventory.$site_id
+    exit;
+fi
+
 printf "SITE |HOSTNAME |IP ADDR |ROUTE |HW TYPE |HW SN |LNX SCORE |KERNEL |HW ARCH |APP VERSION |APP INSTALL DATE(M/D/Y) |UP VERSION |ORA CLI |ORA DB |TT DB |WL VERSION |JAVA VER |RAM |CORES |THREADS |ENA CORES |CPU |HDD SIZE |HDD MODEL |HDD HEALTH |ACTIVE UEFI BANK |UEFI/BIOS VERSION |FILE-MAX (sysctl.conf) |FILE-LIMIT (ulimit -n)|UPTIME |NIC DRVs |EMC MODEL |EMC SERIAL |EMC FLARE |V7k MODEL |V7k TYPE |V7k ENCLOSURE SN |v7K FW |V7k failed HDDs |V7k CONSOLE |V5k MODEL |V5k TYPE |V5k ENCLOSURE SN |v5K FW |V5k failed HDDs |V5k CONSOLE |DD MODEL |DD SERIAL |DD OS |DD DISK STATUS |DD UPTIME \n";
 
 # GENERAL LOOP
-for host in $(grep -iE $host_match /etc/hosts|grep -viE "$lnx_ex_tmplt"|awk {'print$2'}|sort|uniq);
+for host in $(grep -iE $host_match $inventory_file|grep -viE "$lnx_ex_tmplt"|awk {'print$1'}|sort|uniq);
 do ping -c1 -W1 $host 1> /dev/null && printf "$site_id |" && ssh -q $host "
 	hw_type=\`version 2>/dev/null | grep -i hw_type | awk '{print \$2}'\`;
 	hostik=\`hostname\`;
@@ -209,30 +218,3 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id |" && ssh -q $host "
 	printf "\n";
 done;
 #Thats all folks!
-
-#awk -F '|' '{print $2 $12 $13}' *.LINUX_HW_LIST.csv
-
-#mshell secadmin/passw0rd 'version' 2>/dev/null | grep \$hostik | awk '{print \$8}'
-
-#rpm -qa --qf '%{VERSION}| %{INSTALLTIME:day} %{NAME}\n' | grep CBS | sort | tail -1 | awk '{print $1}'| tr -d '\n'
-
-# rpm -qa --qf '(%{INSTALLTIME:day}): %{NAME}-%{VERSION}\n
-# rpm -qa --qf '%{NAME} %{VERSION} %{INSTALLTIME}\n' | grep ^CBS
-# rpm -qa --qf '%{VERSION} %{NAME}\n' | grep CBS | sort | tail -1   
-
-#runuser -l oracle $ORACLE_HOME/OPatch/opatch lsinventory | awk '/^Oracle/ {print $NF}' | tail -1
-#ssh dslu125 "runuser -l oracle '\$ORACLE_HOME/OPatch/opatch lsinventory' | grep -A2 Installed| tail -1 | awk '{print \$3}'"
-# lsnode -v
-#admin@NAS_VIP[NAS_VIP]$ lsnode -v
-#Hostname     IP          Description             Role                         Product version Connection status GPFS status CTDB status Username Is manager Is quorum Daemon ip address Daemon version Is Cache Recovery master Monitoring enabled Ctdb ip address OS name         OS family Serial number Last updated
-#mgmt001st001 169.254.8.2 active management node  management,interface,storage 1.5.1.2-1       OK                active      active      root     yes        yes       169.254.8.2       1350           no       yes             yes                169.254.8.2     RHEL 6.4 x86_64 Linux     7810092       1/29/18 7:59 PM
-#mgmt002st001 169.254.8.3 passive management node management,interface,storage 1.5.1.2-1       OK                active      active      root     yes        yes       169.254.8.3       1350           no       no              yes                169.254.8.3     RHEL 6.4 x86_64 Linux     7810110       1/29/18 7:59 PM
-#admin@NAS_VIP[NAS_VIP]$
-
-#dmidecode_cores=dmidecode -t processor | grep -i 'Core Count' | awk '{print $3}' | tr -d '\n'
-#dmidecode_threads=dmidecode -t processor | grep -i 'Thread Count' | awk '{print $3}' | tr -d '\n'
-#core_enabled=dmidecode -t processor | grep -i 'Core Enabled' | awk '{print $3}' | tr -d '\n'
-
-
-#DD
-# alerts show current

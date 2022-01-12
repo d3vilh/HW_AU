@@ -1,42 +1,43 @@
 #!/bin/bash
 #VEON RUSSIA ONLY!
 #Philipp 11.01.2016
-#v.1.2 LINUX and AIX hosts
+#v.1.2 Inventory files introduced. #v.1.1 esxi + nasgw #v.1.0 LINUX and AIX hosts
 if [ ! -n "$1" ]; then 
-	printf "\n Runs Hardware Inventory checks across all onsite units.\n  Usage: ./audit.run SITE_ID\n    Where SITE_ID is short site name. AIX and LINUX inventory scripts will be updated with this short name on first audit.run execution.\n  Examples:\n    ./audit.run MSK\n    ./audit.run YEKATERINBURG\n    ./audit.run ROSTOV_PAPA\n  Prerequisites:\n    aix_hw_au.sh - runs Hardware Inventory checks against any AIX-based servers.\n    linux_hw_au.sh - runs Hardware Inventory checks against any Linux-based servers.\n\n  Be aware that SANbox and EMCds FCSs checks is depricated in this version, as obsolete HW\n\n";
-	exit; 
+        printf "\n Runs Hardware Inventory checks across all onsite units.\n  Usage: ./audit.run SITE_ID\n    Where SITE_ID is short site name. AIX and LINUX inventory scripts will be updated with this short name on first audit.run execution.\n  Examples:\n    ./audit.run MSK\n    ./audit.run YEKATERINBURG\n    ./audit.run ROSTOV_PAPA\n  Prerequisites:\n    aix_hw_au.sh - runs Hardware Inventory checks against any AIX-based servers.\n    linux_hw_au.sh - runs Hardware Inventory checks against any Linux-based servers.\n\n  Be aware that SANbox and EMCds FCSs checks is depricated in this version, as obsolete HW\n\n";
+        exit; 
 fi;
 SITE_NAME=$1
+#INVENTORY
+if [ ! -e inventory.$SITE_NAME ] ; then
+    printf ' Site inventory file is empty!\n Update Site inventory with necessary IP list and run audit again.\n'
+    printf "#$SITE_NAME INVENTORY FILE\n#V.01\n#Used to run HW INVENTORY AUDIT\n\n### UPM/OAM ###\n256.256.256.256 upm1a_example\n256.256.256.257 upmdb1a_example\n256.256.256.258 oam1a_example\n\n### SDP ###\n\n### RCS ###\n\n### SGU ###\n\n### SLU ###\n\n### OSA ###\n\n### ECI ###\n\n### NOTIF ###\n\n### OFR ###\n\n### SAPI/AJMS/FEADMIN ###\n\n### DTR ###\n\n### SYSRV ###\n\n### NASGW ###\n\n### VCENTER ###\n\n### CISCO JUNIPER ARUBA ###\n\n### LBA ###\n\n### MAU ###\n\n### OTHER ###\n\n" > inventory.$SITE_NAME
+    exit;
+fi
+
 #SITE FIX
-sed -i "s/PROD_SITE/$SITE_NAME/g" linux_hw_au.sh; 
-sed -i "s/PROD_SITE/$SITE_NAME/g" aix_hw_au.sh;
-#HOST TEMPLATE FIX
-lnx_ex_tmplt="^ *#|audit_exclude|farm|blc|slu-dslu|amm|esm|admin|zbx|hsbu|_oob|_ilo|-om|-bb|rctu|cross|old|emc|fcs|_upm|ilo|upm_|vip|nas_console|_hsbn|_sw|-lba" # SITE SPECIFIC TEMPLATE FOR VEON RUSSIA
-sed -i "s/MY_TEMPLATE\";/$lnx_ex_tmplt\"/g" linux_hw_au.sh;
-aix_ex_tmplt="^ *#|audit_exclude|localhost|farm|blu|acmi|admin|emc|v7000|om|hmc|fcs|emc|tape|asmi|zbx|hsbu|mau|rctu" # SITE SPECIFIC TEMPLATE FOR VEON RUSSIA
-sed -i "s/MY_TEMPLATE\";/$aix_ex_tmplt\"/g" aix_hw_au.sh;
-#Temp script for FEADMIN and UPM/OAM unites:
-yes | cp -p linux_hw_au.sh fead.tmp.sh; sed -i "s/admin|//g" fead.tmp.sh; sed -i "s/vip|//g" fead.tmp.sh; sed -i "s/-bb|//g" fead.tmp.sh; 
+sed -i "s/PROD_SITE/$SITE_NAME/g" linux_hw_au.sh; sed -i "s/PROD_SITE/$SITE_NAME/g" aix_hw_au.sh;
+
 #LINUX COLLECT
-printf "\n Keep an eye on the progress. Human input might be required.\n\n Running HW Inventory on following units: \n SGU, DTR, SLU, OSA, ECI, NOTIF, OFR, SAPI, AJMS, FEADMIN, UPM, OAM, OEM, UPMDB, RCS, SY, SMSNE_APP, SDP, SMSNE_DB\n"; 
-printf ' PROGRESS: 1%%  [...................................................] RUNNING ON: SGU\r'; ./linux_hw_au.sh sgu > $SITE_NAME.LINUX_HW_LIST.csv; 
-printf ' PROGRESS: 6%%  [###................................................] RUNNING ON: DTR\r'; ./linux_hw_au.sh dtr|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-printf ' PROGRESS: 12%% [######.............................................] RUNNING ON: SLU\r'; ./linux_hw_au.sh slu|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-printf ' PROGRESS: 18%% [#########..........................................] RUNNING ON: OSA\r'; ./linux_hw_au.sh osa|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-printf ' PROGRESS: 24%% [############.......................................] RUNNING ON: ECI\r'; ./linux_hw_au.sh eci|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-printf ' PROGRESS: 30%% [###############....................................] RUNNING ON: NOTIF\r'; ./linux_hw_au.sh notif|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-printf ' PROGRESS: 36%% [##################.................................] RUNNING ON: OFR  \r'; ./linux_hw_au.sh ofr|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-printf ' PROGRESS: 42%% [#####################..............................] RUNNING ON: SAPI \r'; ./linux_hw_au.sh sapi|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-printf ' PROGRESS: 48%% [########################...........................] RUNNING ON: AJMS \r'; ./linux_hw_au.sh ajms|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-printf ' PROGRESS: 54%% [###########################........................] RUNNING ON: FEADMIN\r'; ./fead.tmp.sh feadmin|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-printf ' PROGRESS: 60%% [##############################.....................] RUNNING ON: UPM/OAM\r'; ./linux_hw_au.sh upm|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-printf ' PROGRESS: 66%% [#################################..................] RUNNING ON: OEM    \r'; ./linux_hw_au.sh oem|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-printf ' PROGRESS: 72%% [####################################...............] RUNNING ON: UPMDB  \r'; ./fead.tmp.sh upmdb|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-printf ' PROGRESS: 78%% [#######################################............] RUNNING ON: RCS    \r'; ./linux_hw_au.sh rcs|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-printf ' PROGRESS: 84%% [##########################################.........] RUNNING ON: SYSRV  \r'; ./linux_hw_au.sh sysrv|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-printf ' PROGRESS: 90%% [#############################################......] RUNNING ON: SMSNE_APP\r'; ./linux_hw_au.sh smsne_app|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
-yes | rm fead.tmp.sh #cleanup of tmp file
+printf "\n Keep an eye on the progress. Human input might be required.\n\n Running HW Inventory on following units: \n SGU, DTR, SLU, OSA, ECI, NOTIF, OFR, SAPI, AJMS, FEADMIN, UPM/OAM, OEM, UPMDB, RCS, SYSRV, NASGW, SMSNE_APP, SDP, SMSNE_DB\n"; 
+printf ' PROGRESS: 1%%  [#.......................................] RUNNING ON: SGU\r'; ./linux_hw_au.sh sgu > $SITE_NAME.LINUX_HW_LIST.csv; 
+printf ' PROGRESS: 5%%  [##......................................] RUNNING ON: DTR\r'; ./linux_hw_au.sh dtr|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 10%% [####....................................] RUNNING ON: SLU\r'; ./linux_hw_au.sh slu|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 15%% [######..................................] RUNNING ON: OSA\r'; ./linux_hw_au.sh osa|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 20%% [########................................] RUNNING ON: ECI\r'; ./linux_hw_au.sh eci|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 22%% [#########...............................] RUNNING ON: NOTIF\r'; ./linux_hw_au.sh notif|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 24%% [##########..............................] RUNNING ON: OFR  \r'; ./linux_hw_au.sh ofr|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 25%% [###########.............................] RUNNING ON: SAPI \r'; ./linux_hw_au.sh sapi|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 33%% [#############...........................] RUNNING ON: AJMS \r'; ./linux_hw_au.sh ajms|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 35%% [##############..........................] RUNNING ON: FEADMIN\r'; ./linux_hw_au.sh feadmin|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 40%% [################........................] RUNNING ON: UPM/UPMDB\r'; ./linux_hw_au.sh upm|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 45%% [##################......................] RUNNING ON: OAM    \r'; ./linux_hw_au.sh oam|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 50%% [####################....................] RUNNING ON: OEM  \r'; ./linux_hw_au.sh oem|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 55%% [######################..................] RUNNING ON: RCS    \r'; ./linux_hw_au.sh rcs|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 60%% [########################................] RUNNING ON: SYSRV  \r'; ./linux_hw_au.sh sysrv|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 65%% [##########################..............] RUNNING ON: NASGW  \r'; ./linux_hw_au.sh nasgw|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 70%% [############################............] RUNNING ON: VP-ESXI  \r'; ./linux_hw_au.sh vp-x86|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
+printf ' PROGRESS: 75%% [##############################..........] RUNNING ON: SMSNE_APP\r'; ./linux_hw_au.sh smsne_app|grep -v FILE-MAX >> $SITE_NAME.LINUX_HW_LIST.csv;
 #AIX COLLECT
-printf ' PROGRESS: 96%% [################################################...] RUNNING ON: SDP + SMSNE_DB\r'; ./aix_hw_au.sh sdp |grep -v FILE-MAX > $SITE_NAME.AIX_HW_LIST.csv;
-printf " COMPLETED 100%%[###################################################] `date +'%H:%M:%S %d.%m.%Y'`       \r\n\n";
+printf ' PROGRESS: 80%% [################################........] RUNNING ON: SDP + SMSNE_DB\r'; ./aix_hw_au.sh sdp |grep -v FILE-MAX > $SITE_NAME.AIX_HW_LIST.csv;
+printf " COMPLETED 100%%[########################################] `date +'%H:%M:%S %d.%m.%Y'`       \r\n\n";
 #EOShit-codding
