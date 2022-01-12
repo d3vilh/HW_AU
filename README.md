@@ -29,20 +29,20 @@ The Inventory utility provides following information:
 PREREQUISITES
 --------------
 * Require **Bash version 3** or higher on the master server (`bash --version`) 
-* The `/etc/hosts` file on the master server should be reviewed before the first run
+* The `inventory.SITE_ID` file should be updated with IPs and hosts you desire to run audit. You can cat /etc/hosts into inventory, but be sure there are no duplicated records for the same server.
 * SSH password-less access needs be configured across all UNIX servers (Linux and AIX). If this configuration is missed the utility will ask for the password for every server where no ssh certificates is present
 * For IBM v7000 and fs900 storages, ssh password-less access needs to be present on SDP_A node to both storage enclosures(active and stby.). This is default configuration.
 * The Hardware Inventory tool support any Linux or AIX versions on the remote servers by default. However, Site specific configuration should be done for `audit.run` script.
 
 PREPARATION
 -----------
-**1. The `/etc/hosts` file** on the master server should be ready to run inventory, as it takes servers list from the masters server `/etc/hosts` file.
-The scripts uses special filters to avoid running inventory on the same host several times. As addition cause you can add special filter to exclude not necessary servers from the inventory list by adding the line `#audit_exclude` for every `/etc/hosts` server record. For example:
+**1. The `inventory.SITE_ID` file** will be created automatically with necessary template on first `audit.run` execution in ./ directory. Then you have to update it with all the IPs and hosts you are desired to run audit. `cat /etc/hosts > inventory.SITE_ID` will also works for you, just be sure there will not be any duplicated records (othervise you'll have dup results) and final forma of every line will be `IP hostname`.
+The linux and aix audit scripts uses special filters to avoid running inventory on the same host several times. Nevertheless it is recomended to carefully review inventory file. You can add special filter to exclude not necessary servers from the inventory list by adding the line `#audit_exclude` for every server record. For example:
 
 ``` shell
-CELCO:oam1a:/root# grep audit_exclude /etc/hosts 
-10.1.1.112 upmdb upmdb_vip #audit_exclude
-10.1.1.113 ORACLE_RAC orac-upmdb upmdb #audit_exclude
+CELCO:oam1a:/root# grep audit_exclude inventory.CELCO 
+10.1.1.112 upmdb1a #audit_exclude
+10.1.1.113 upmdb1b #audit_exclude
 10.1.1.234 BitCoin1 miner1 #audit_exclude 
 ```
 **FOR BASIC INVENTORY** - skip preparation and go to next step - [FULL SITE INVENTORY](https://github.com/d3vilh/HW_AU#full-site-inventory)
