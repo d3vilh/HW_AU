@@ -1,6 +1,6 @@
 #!/bin/bash
 #Shilov 2015
-#v.0.1.4 adjustments for A.Fedonov #v.0.1.3 Inventory file introduced #v.0.1.1 new GIT versioning #ver 2.8.7 fix for runuser #ver 2.8.6 smal fix #ver 2.8.5 Templates introduced #ver 2.8.4 new storge IBM 5k and backyp-gw #2.8.3.3 output conveyor fixed #2.8.2 +WL, UP and java ver. #fix for LNX6.9 oracle version #2.8 WA for new hosts&sy #v.2.7 02.06.2020 +kernel +ulimits +nic_drivers +component version, fixed: ora_ver for ballenger&langley #v2.6 14.01.2020: +HP Gen10 support +TimesTen version #v2.5 22.08.2019: + HDD Size and Model. #v2.4 21.08.2019: + Oracle ver. #v2.3 22.03.2019: + HW SNs. #v2.2 20.03.2018: CPU cores + threads fix. VMVARE HW_TYPE support.
+#v.0.1.5 esxi fields + hw_vendor fix #v.0.1.4 adjustments for A.Fedonov #v.0.1.3 Inventory file introduced #v.0.1.1 new GIT versioning #ver 2.8.7 fix for runuser #ver 2.8.6 smal fix #ver 2.8.5 Templates introduced #ver 2.8.4 new storge IBM 5k and backyp-gw #2.8.3.3 output conveyor fixed #2.8.2 +WL, UP and java ver. #fix for LNX6.9 oracle version #2.8 WA for new hosts&sy #v.2.7 02.06.2020 +kernel +ulimits +nic_drivers +component version, fixed: ora_ver for ballenger&langley #v2.6 14.01.2020: +HP Gen10 support +TimesTen version #v2.5 22.08.2019: + HDD Size and Model. #v2.4 21.08.2019: + Oracle ver. #v2.3 22.03.2019: + HW SNs. #v2.2 20.03.2018: CPU cores + threads fix. VMVARE HW_TYPE support.
 if [ ! -n "$1" ]; then 
 	printf "\n Runs Hardware Inventory checks against any Linux-based servers.\n  Usage: ./linux_hw_au.sh HOSTNAME SITE_ID\n   Where:\n     HOSTNAME can be necessary server to run inventory on or mask for the group of hosts from the /etc/hosts\n   	 SITE_ID is optional parameter, will be inserted as first column of output. PROD_SITE is used by default\n  Examples:\n    ./linux_hw_au.sh sgu21b MSK\n    ./linux_hw_au.sh slu EKT\n    ./linux_hw_au.sh sgu23\n\n";
 	exit; 
@@ -23,11 +23,11 @@ inventory_file=inventory.$site_id
 
 if [ ! -e $inventory_file ] ; then
     printf ' Site inventory file is empty!\n Update Site inventory with necessary IP list and run audit again.\n'
-    printf "#$site_id INVENTORY FILE\n#V.01\n#Used to run HW INVENTORY AUDIT\n\n### UPM/OAM ###\n256.256.256.256 upm1a_example\n256.256.256.257 upmdb1a_example\n256.256.256.258 oam1a_example\n\n### SDP ###\n\n### RCS ###\n\n### SGU ###\n\n### SLU ###\n\n### OSA ###\n\n### ECI ###\n\n### NOTIF ###\n\n### OFR ###\n\n### SAPI/AJMS/FEADMIN ###\n\n### DTR ###\n\n### SYSRV ###\n\n### NASGW ###\n\n### VCENTER ###\n\n### CISCO JUNIPER ARUBA ###\n\n### LBA ###\n\n### MAU ###\n\n### OTHER ###\n\n" > inventory.$site_id
+    printf "#$site_id INVENTORY FILE\n#V.01\n#Used to run HW INVENTORY AUDIT\n\n### UPM/OAM ###\n256.256.256.256 upm1a_example\n256.256.256.257 upmdb1a_example\n256.256.256.258 oam1a_example\n\n### SDP ###\n256.256.256.259 sdp10a #lnxsdp\n256.256.256.260 sdp13a #aixsdp\n\n### RCS ###\n\n### SGU ###\n\n### SLU ###\n\n### OSA ###\n\n### ECI ###\n\n### NOTIF ###\n\n### OFR ###\n\n### SAPI/AJMS/FEADMIN ###\n\n### DTR ###\n\n### SYSRV ###\n\n### NASGW ###\n\n### VCENTER ###\n256.256.256.261 VCENTER vcenter\n256.256.256.262 vp-x86-esxi-1\n\n### CISCO JUNIPER ARUBA ###\n\n### LBA ###\n\n### MAU ###\n\n### OTHER ###\n\n" > inventory.$site_id
     exit;
 fi
 
-printf "SITE|HOSTNAME|IP ADDR|ROUTE|HW VENDOR|HW TYPE|HW SN|LNX SCORE|KERNEL|HW ARCH|APP VERSION|APP INSTALL DATE(M/D/Y)|UP VERSION|ORA CLIENT|ORA DB|TT DB|WL VERSION|JAVA VER|RAM|PHYSICAL CPUS|CORES|THREADS|CPU MODEL|HDD SIZE|HDD MODEL|HDD HEALTH|ACTIVE UEFI BANK|UEFI/BIOS VERSION|FILE-MAX (sysctl.conf)|FILE-LIMIT (ulimit -n)|UPTIME|NIC DRVs|EMC MODEL|EMC SERIAL|EMC FLARE|V7k MODEL|V7k TYPE|V7k ENCLOSURE SN|v7K FW|V7k failed HDDs|V7k CONSOLE|V5k MODEL|V5k TYPE|V5k ENCLOSURE SN|v5K FW|V5k failed HDDs|V5k CONSOLE|DD MODEL|DD SERIAL|DD OS|DD DISK STATUS|DD UPTIME\n";
+printf "SITE|HOSTNAME|IP ADDR|ROUTE|HW VENDOR|HW TYPE|HW SN|LNX SCORE|KERNEL|HW ARCH|APP VERSION|APP INSTALL DATE(M/D/Y)|UP VERSION|ORA CLIENT|ORA DB|TT DB|WL VERSION|JAVA VER|RAM|PHYSICAL CPUS|CORES|THREADS|CPU MODEL|HDD SIZE|HDD MODEL|HDD HEALTH|ACTIVE UEFI BANK|UEFI/BIOS VERSION|FILE-MAX (sysctl.conf)|FILE-LIMIT (ulimit -n)|UPTIME|NIC DRVs|EMC MODEL|EMC SERIAL|EMC FLARE|V7k MODEL|V7k TYPE|V7k ENCLOSURE SN|v7K FW|V7k failed HDDs|V7k CONSOLE|V5k MODEL|V5k TYPE|V5k ENCLOSURE SN|v5K FW|V5k failed HDDs|V5k CONSOLE|DD MODEL|DD SERIAL|DD OS|DD DISK STATUS|DD UPTIME|HOSTED VMs\n";
 
 # GENERAL LOOP
 for host in $(grep -iE $host_match $inventory_file|grep -viE "$lnx_ex_tmplt"|awk {'print$1'}|sort|uniq);
@@ -70,10 +70,10 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id|" && ssh -q $host "
 				fi; 
 		;; 
 		VMWARE ) hdd_size=\`fdisk -l /dev/sda 2>/dev/null | grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
-				 hdd_model=\`smartctl -a /dev/sda | grep 'Device:' | awk '{print \$2 \$3}'|tr -d '\n'\`; 
+				 hdd_model=\`printf \"VMWARE NA\"\`; 
 				 hdd_heal=\`printf \"Not Supported\"\`;
 				 cur_fw_bank=\`printf \"VMWARE NA\"\`; 
-				 cur_fw=\`dmidecode | grep -i 'Firmware Revision' | awk '{print \$3}'| tr -d '\n'\`; 
+				 cur_fw=\`printf \"VMWARE NA\"\`; 
 				 r_hw_vendor=\`printf \"VM\"\`; 
 				 r_hw_type=\`dmidecode | grep 'Product Name' | awk '{print \$3}'| tr -d '\n'\`; 
 				 r_hw_sn=\`dmidecode | grep -A3 -i 'Product Name' | grep Serial | awk -F ':' '{print \$2}' |head -1| tr -d '\n'\`
@@ -81,7 +81,7 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id|" && ssh -q $host "
 		Compaq ) r_hw_sn=\`dmidecode | grep -A3 -i 'Product Name' | grep Serial | awk '{print \$3}'| tr -d '\n'\`; 
 				 cur_fw_bank=\`printf \"HP NA\"\`; 
 				 cur_fw=\`dmidecode | grep -i 'Firmware Revision' | awk '{print \$3}'| tr -d '\n'\`; 
-				 r_hw_vendor=\`printf \"Hewlett-Packard\"\`; 
+				 r_hw_vendor=\`printf \"HPE\"\`; 
 				 r_hw_type=\`dmidecode | grep 'Product Name' | awk '{print \$3,\$4,\$5}'| tr -d '\n'\`; 
 				 hdd_size=\`fdisk -l /dev/sda 2>/dev/null | grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
 				 hdd_model=\`smartctl -a -d cciss,0 /dev/cciss/c0d0| grep 'Device:' | awk '{print \$2,\$3}'|tr -d '\n'\`;
@@ -99,7 +99,7 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id|" && ssh -q $host "
 		ProLiant ) r_hw_sn=\`dmidecode | grep -A3 -i 'Product Name' | grep Serial | awk '{print \$3}'| tr -d '\n'\`; 
 				   cur_fw_bank=\`printf \"HP NA\"\`; 
 				   cur_fw=\`dmidecode | grep -i 'Firmware Revision' | awk '{print \$3}'| tr -d '\n'\`; 
-				   r_hw_vendor=\`printf \"Hewlett-Packard\"\`; 
+				   r_hw_vendor=\`printf \"HPE\"\`; 
 				   r_hw_type=\`dmidecode | grep 'Product Name' | awk '{print \$3,\$4,\$5}'| tr -d '\n'\`; 
 				   hdd_size=\`fdisk -l 2>/dev/null | grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
 				   hdd_model=\`smartctl -a -d cciss,0 /dev/cciss/c0d0| grep 'Device:' | awk '{print \$2,\$3}'|tr -d '\n'\`;
@@ -115,7 +115,7 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id|" && ssh -q $host "
 			  cur_fw_bank=\`printf \"HP NA\"\`;
 			  cur_fw=\`printf \"FW: \";
 			  dmidecode | grep -i 'Firmware Revision' | awk '{print \$3}'| tr -d '\n';printf \" BIOS: \";dmidecode | grep -i 'BIOS Rev' | awk '{print \$NF}'| tr -d '\n';\`;
-			  r_hw_vendor=\`printf \"Hewlett-Packard\"\`; 
+			  r_hw_vendor=\`printf \"HPE\"\`; 
 			  r_hw_type=\`dmidecode | grep -A4 'System Information' | grep 'Product Name' | awk '{print \$3,\$4,\$5}'| tr -d '\n'\`; 
 			  hdd_size=\`fdisk -l 2>/dev/null | grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
 			  hdd_model=\`smartctl -a -d cciss,0 /dev/cciss/c0d0| grep 'Device:' | awk '{print \$2,\$3}'|tr -d '\n'\`; 
@@ -179,7 +179,7 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id|" && ssh -q $host "
 		runuser -l oracle '\$ORACLE_HOME/OPatch/opatch lsinventory' 2>/dev/null > /tmp/lnx_hw_au.txt; 
 		runuser -l ttuser -c '\$TT_HOME/bin/ttadmin -version' 2>/dev/null >> /tmp/lnx_hw_au.txt; 
 	fi
-	orad_ver=\`grep Database /tmp/lnx_hw_au.txt |tail -1 | awk '{print \$NF}'|tr -d '\n'\`;
+	orad_ver=\`grep Database /tmp/lnx_hw_au.txt |tail -1 | awk '{print \$NF}'|tr -d '\"'|tr -d '\n'\`;
 	tt_ver=\`grep TimesTen /tmp/lnx_hw_au.txt |tail -1 | awk '{print \$NF}'|tr -d '\n'\`;
 	case \$hostik in 
 		upm1 | upm2 ) hw_arch=\`printf \"i686\"\`; 
@@ -201,9 +201,9 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id|" && ssh -q $host "
 					  v7k=\`printf \"same as node1|same as node1|same as node1|same as node1|same as node1\"\`; v5k=\`printf \"same as node1|same as node1|same as node1|same as node1|same as node1\"\`;
 		;; 
 		* ) emc=\`printf \"NA|NA|NA\"\`; 
-			v7k=\`printf \"NA|NA|NA|NA|NA\"\`; 
+			v7k=\`printf \"NA|NA|NA|NA|NA|NA\"\`; 
 			dd=\`printf \"NA|NA|NA|NA|NA\"\`; 
-			v5k=\`printf \"NA|NA|NA|NA|NA\"\`;
+			v5k=\`printf \"NA|NA|NA|NA|NA|NA\"\`;
 		;; 
 	esac
 	if [[ -z \$hw_type ]]; then hw_type=\`printf \"NA\"\`; fi
@@ -218,13 +218,13 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id|" && ssh -q $host "
 	if [[ -z \$tt_ver ]]; then tt_ver=\`printf \"NA\"\`; fi
 	if [[ -z \$core_enabled ]]; then core_enabled=\`printf \"NA\"\`; fi
 	if [[ -z \$app_version_date ]]; then app_version_date=\`printf \"NA|NA\"\`; fi
-	if [[ -z \$v5k ]]; then v5k=\`printf \"NA|NA|NA|NA|NA\"\`; fi
+	if [[ -z \$v5k ]]; then v5k=\`printf \"NA|NA|NA|NA|NA|NA\"\`; fi
 	if [[ -z \$dd ]]; then dd=\`printf \"NA|NA|NA|NA|NA\"\`; fi
-	if [[ -z \$v7k ]]; then v7k=\`printf \"NA|NA|NA|NA|NA\"\`; fi
+	if [[ -z \$v7k ]]; then v7k=\`printf \"NA|NA|NA|NA|NA|NA\"\`; fi
 	if [[ -z \$emc ]]; then emc=\`printf \"NA|NA|NA\"\`; fi
 	if [[ -z \$cur_fw_bank ]]; then cur_fw_bank=\`printf \"NA\"\`; fi
 	if [[ -z \$cur_fw ]]; then cur_fw=\`printf \"NA\"\`; fi
-	printf \"\$hostik|\$ip_addr|\$routes|\$r_hw_vendor|\$r_hw_type|\$r_hw_sn|\$score|\$our_kernel|\$hw_arch|\$app_version_date|\$up_version|\$orac_ver|\$orad_ver|\$tt_ver|\$wl_version|\$java_version|\$ram|\$phy_c_count|\$c_cores|\$c_threads|\$cpu_m|\$hdd_size|\$hdd_model|\$hdd_heal|\$cur_fw_bank|\$cur_fw|\$max_files|\$file_limit|\$uptime|\$nic_drivers|\$emc|\$v7k|\$v5k|\$dd|\";";
+	printf \"\$hostik|\$ip_addr|\$routes|\$r_hw_vendor|\$r_hw_type|\$r_hw_sn|\$score|\$our_kernel|\$hw_arch|\$app_version_date|\$up_version|\$orac_ver|\$orad_ver|\$tt_ver|\$wl_version|\$java_version|\$ram|\$phy_c_count|\$c_cores|\$c_threads|\$cpu_m|\$hdd_size|\$hdd_model|\$hdd_heal|\$cur_fw_bank|\$cur_fw|\$max_files|\$file_limit|\$uptime|\$nic_drivers|\$emc|\$v7k|\$v5k|\$dd|NA\";";
 	printf "\n";
 done;
 #Thats all folks!

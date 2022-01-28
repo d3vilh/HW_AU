@@ -4,6 +4,7 @@ Runs audit for all AIX and Linux servers in /etc/hosts of your master node and p
 
 UPDATES
 --------
+* **v.0.1.5** 28.01.2022 + esxi hosts inventory and various bugfixes  
 * **v.0.1.2** 11.01.2022 Inventory fileto store all the hosts 
 * **v.0.1.1** 13.09.2021 AIX UAC Expiration date report 
 
