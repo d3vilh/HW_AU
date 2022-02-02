@@ -83,7 +83,7 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id|" && ssh -q $host "
 				 cur_fw=\`dmidecode | grep -i 'Firmware Revision' | awk '{print \$3}'| tr -d '\n'\`; 
 				 r_hw_vendor=\`printf \"HPE\"\`; 
 				 r_hw_type=\`dmidecode | grep 'Product Name' | awk '{print \$3,\$4,\$5}'| tr -d '\n'\`; 
-				 hdd_size=\`fdisk -l /dev/sda 2>/dev/null | grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
+				 hdd_size=\`fdisk -l 2>/dev/null|grep -B80 Linux|grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
 				 hdd_model=\`smartctl -a -d cciss,0 /dev/cciss/c0d0| grep 'Device:' | awk '{print \$2,\$3}'|tr -d '\n'\`;
 				 hdd_heal=\`smartctl -a -d cciss,0 /dev/cciss/c0d0  2>/dev/null| grep 'Health' |awk '{print \$NF}'|tr -d '\n'\`;
 				 	if [[ -z \$hdd_model ]]; then 
@@ -101,7 +101,7 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id|" && ssh -q $host "
 				   cur_fw=\`dmidecode | grep -i 'Firmware Revision' | awk '{print \$3}'| tr -d '\n'\`; 
 				   r_hw_vendor=\`printf \"HPE\"\`; 
 				   r_hw_type=\`dmidecode | grep 'Product Name' | awk '{print \$3,\$4,\$5}'| tr -d '\n'\`; 
-				   hdd_size=\`fdisk -l 2>/dev/null | grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
+				   hdd_size=\`fdisk -l 2>/dev/null|grep -B80 Linux|grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
 				   hdd_model=\`smartctl -a -d cciss,0 /dev/cciss/c0d0| grep 'Device:' | awk '{print \$2,\$3}'|tr -d '\n'\`;
 				   hdd_heal=\`smartctl -a -d cciss,0 /dev/cciss/c0d0  2>/dev/null| grep 'Health' |awk '{print \$NF}'|tr -d '\n'\`;
 				   	if [[ -z \$hdd_model ]]; then 
@@ -117,7 +117,7 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id|" && ssh -q $host "
 			  dmidecode | grep -i 'Firmware Revision' | awk '{print \$3}'| tr -d '\n';printf \" BIOS: \";dmidecode | grep -i 'BIOS Rev' | awk '{print \$NF}'| tr -d '\n';\`;
 			  r_hw_vendor=\`printf \"HPE\"\`; 
 			  r_hw_type=\`dmidecode | grep -A4 'System Information' | grep 'Product Name' | awk '{print \$3,\$4,\$5}'| tr -d '\n'\`; 
-			  hdd_size=\`fdisk -l 2>/dev/null | grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
+			  hdd_size=\`fdisk -l 2>/dev/null|grep -B80 Linux|grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
 			  hdd_model=\`smartctl -a -d cciss,0 /dev/cciss/c0d0| grep 'Device:' | awk '{print \$2,\$3}'|tr -d '\n'\`; 
 			  hdd_heal=\`smartctl -a -d cciss,0 /dev/cciss/c0d0| grep 'Health' |awk '{print \$NF}'|tr -d '\n'\`; 
 			  	if [[ -z \$hdd_model ]]; then 

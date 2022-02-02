@@ -53,9 +53,10 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id|" && ssh -q $host "
     hdd_size=\`esxcli storage core device list | grep -B1 Direct-Access | grep Size | awk '{ a = \$2; sgb = a / 953.674; print sgb\".0GB\"}'\`; 
     hdd_model=\`esxcli storage core device list | grep -A4 Direct-Access | grep Model | awk '{print \$2}'\`; 
     cur_fw=\`vim-cmd hostsvc/hosthardware | grep -A6 bios | grep -E 'Vers|major|minor' | awk '{print \$3}' | od -c | awk -F '   ' '{print\$3\$4\$5\".\"\$8\".\"\$10\$11}'| head -1\`; 
-    hosted_vms=\`esxcli vm process list | grep Display | awk '{print \$3}'\`;
+    hosted_vms=\`vim-cmd vmsvc/getallvms | grep vmx | awk '{print \$3\":\"\$2}'\`;
     [ -z \"\$hosted_vms\" ] && hosted_vms=\`printf \"Empty ESXi\"\`;
 	printf \"\$hostik|\$ip_addr|\$routes|\$r_hw_vendor|\$r_hw_type|\$r_hw_sn|\$score|\$our_kernel|\$hw_arch|\$app_version|\$app_date|NA|NA|NA|NA|NA|NA|\$ram|\$phy_c_count|\$c_cores|\$c_threads|\$cpu_m|\$hdd_size|\$hdd_model|NA|NA|\$cur_fw|NA|\$file_limit|\$uptime|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|\`echo \$hosted_vms\`\";";
 	printf "\n";
 done;
+#    hosted_vms=\`esxcli vm process list | grep Display | awk '{print \$3}'\`;
 #Thats all folks!
