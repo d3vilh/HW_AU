@@ -25,7 +25,7 @@ printf "SITE|HOSTNAME|HW TYPE|SYSTEM MODEL|SERIAL|NGSCORE|DBCORE|ORACLE DB|ORACL
 
 # GENERAL LOOP
 for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk {'print$2'}|sort|uniq | grep -E 'a|b');
-	do ping -c1 -W1 $host 1>/dev/null && printf "$site_id |$host |" && ssh -q $host "
+	do ping -c1 -W1 $host 1>/dev/null && printf "$site_id|$host|" && ssh -q $host "
 	hostmane=\`hostname\`
 	hostmane_ip=\$hostmane\`printf '_'\`
 	find /tmp -name 'prtconf.txt' -mtime +120 -exec rm {} \;
@@ -43,7 +43,7 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 	blu_sn=\`lscfg -vl rmt0 2>/dev/null | grep -i 'Serial' | awk -F '[.]' '{print \$16}' | tr -d '\n [:blank:]';\`
 	nsr_license=\`printf 'print type:nsr license\\n\\n' 2> /dev/null | nsradmin -s sdp_nsr -i - 2>/dev/null | grep expiration | grep -v Authorized | awk '{print \$3,\$4,\$5}'| tr -d '\n';\`
 	nsr_version=\`print 'show name ; Networker version\nprint type:NSR client;\n' 2> /dev/null|/usr/bin/nsradmin -s sdp_nsr -i - 2> /dev/null|grep 'NetWorker version:'|grep Build|head -1 | awk '{print \$3}'| tr -d '\n';\`
-	emc=\`grep Model: /tmp/navi_agent.txt | awk '{print \$2}'| tr -d '\n'; printf ' |'; grep No: /tmp/navi_agent.txt | awk '{print \$3}'| tr -d '\n'; printf ' |'; grep Revision: /tmp/navi_agent.txt | awk '{print \$2}'| tr -d '\n';\`
+	emc=\`grep Model: /tmp/navi_agent.txt | awk '{print \$2}'| tr -d '\n'; printf '|'; grep No: /tmp/navi_agent.txt | awk '{print \$3}'| tr -d '\n'; printf '|'; grep Revision: /tmp/navi_agent.txt | awk '{print \$2}'| tr -d '\n';\`
 	errpt=\`errpt | wc -l| tr -d '\n [:blank:]';\`
 	java_version=\`java -version 2>&1 |head -n 1| awk '{print \$3}' |tr -d '\"'|tr -d '\n'\`
 	up_version=\`grep -i wrapper.java.additional.5= \$JBOSS_HOME/conf/wrapper.conf 2>/dev/null| awk -F '=' '{print \$3}'\`;
@@ -63,8 +63,8 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 	ram_size=\`grep 'Memory Size:' /tmp/prtconf.txt | grep -v Good| awk '{print \$3,\$4}'| tr -d '\n';\`
 	good_ram_size=\`grep 'Good Memory Size:' /tmp/prtconf.txt | awk '{print \$4,\$5}'| tr -d '\n'; \`
 	num_of_ram_modules=\`lscfg -vp | grep -e Size | awk '{print substr (\$1,29)}'  | wc -l | bc\`
-	size_of_ram_modules=\`lscfg -vp | grep -e Size | awk '{print substr (\$1,29)}'  | tr '\n' ' '\`
-	page_size=\`svmon -G | grep KB | awk '{print \$1, \$2, \$3}' | tr '\n' ' '\`
+	size_of_ram_modules=\`lscfg -vp | grep -e Size | awk '{print substr (\$1,29)}'| tr '\n' ' '\`
+	page_size=\`svmon -G | grep KB | awk '{print \$1, \$2, \$3}' | tr -d '\n'\`
 	num_of_cpu=\`grep Processors /tmp/prtconf.txt | awk '{print \$4}'\`
 	cpu_speed=\`grep 'Processor Clock Speed:' /tmp/prtconf.txt | awk '{print \$4,\$5}'| tr -d '\n'; \`
 	cpu_smt_mode=\`smtctl | grep supports | awk '{print \$6}'| tr -d '\n'; \`
@@ -78,8 +78,8 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 	ngscore=\`cat /etc/BaseOS_version | grep 'SDP NGSCORE' | awk '{print \$4}' | sort | tail -1| tr -d '\n';\`
 	if [[ \$(hostname -s) = sdp1 ]] && [[ \$hw_type = POWER8 ]]; then
 		v7000_model=\`ssh superuser@san_console 'lssystem' 2> /dev/null | grep product_name| awk '{print \$2, \$3, \$4}'| tr -d '\n'|grep -v san_console;\`
-		v7000_enclosure_type=\`ssh superuser@san_console 'lsenclosure' 2> /dev/null | grep io_grp| awk '{print \$3, \$7}' | tr '\n' ' '\`
-		v7000_sn=\`ssh superuser@san_console 'lsenclosure' 2> /dev/null | grep io_grp| awk '{print \$3, \$8}' | tr '\n' ' '\`
+		v7000_enclosure_type=\`ssh superuser@san_console 'lsenclosure' 2> /dev/null | grep io_grp| awk '{print \$3\":\"\$7}'| tr '\n' ' '\`
+		v7000_sn=\`ssh superuser@san_console 'lsenclosure' 2> /dev/null | grep io_grp| awk '{print \$3\":\"\$8}'| tr '\n' ' '\`
 		v7000_fw=\`ssh superuser@san_console 'lssystem' 2> /dev/null | grep code_level| awk '{print \$2}'| tr -d '\n';\`
 		v7000_ip=\`ssh superuser@san_console 'lssystem' 2> /dev/null | grep console_IP| awk '{print \$2}'| tr -d '\n'; \`
 		v7000_fhdd=\`ssh superuser@san_console 'lsdrive' 2> /dev/null | grep failed| wc -l | tr '\n' ' '\`
@@ -95,7 +95,7 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 			v7000f_fw=\`ssh superuser@san_console_flash 'lssystem' 2> /dev/null | grep code_level| awk '{print \$2}'| tr -d '\n';\`
 			v7000f_ip=\`ssh superuser@san_console_flash 'lssystem' 2> /dev/null | grep console_IP| awk '{print \$2}'| tr -d '\n';\`
 			v7000f_sn=\`ssh superuser@san_console_flash 'lsenclosure' 2> /dev/null | grep -v status| awk '{print \$5}' | tr '\n' ' '\`
-			v7000f_fhdd=\`ssh superuser@san_console_flash 'lsdrive' 2> /dev/null | grep failed| wc -l | tr '\n' ' '\`
+			v7000f_fhdd=\`ssh superuser@san_console_flash 'lsdrive' 2> /dev/null | grep failed| wc -l | tr '\n' ' ' |tr -d ' '\`
 				if [[ -z \$v7000_model ]]; then v7000_model=\`printf \"NA\"\`; fi
 				if [[ -z \$v7000_enclosure_type ]]; then v7000_enclosure_type=\`printf \"NA\"\`; fi
 				if [[ -z \$v7000_fw ]]; then v7000_fw=\`printf \"NA\"\`; fi
@@ -126,10 +126,10 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 		v7000f_ip=\`ssh superuser@san_console_flash 'lssystem' 2> /dev/null | grep console_IP| awk '{print \$2}'| tr -d '\n';\`
 		v7000f_sn=\`ssh superuser@san_console_flash 'lsenclosure' 2> /dev/null | grep -v status| awk '{print \$5}' | tr '\n' ' '\`
 		v7000f_fhdd=\`ssh superuser@san_console_flash 'lsdrive' 2> /dev/null | grep failed| wc -l | tr '\n' ' '\`
-		emc=\`printf \"NA |NA |NA\"\`
+		emc=\`printf \"NA|NA|NA\"\`
 	fi
 	if [[ \$(hostname -s) = sdp2 ]] && [[ \$hw_type = POWER8 || \$hw_type = POWER9 ]]; then
-		emc=\`printf \"NA |NA |NA\"\`
+		emc=\`printf \"NA|NA|NA\"\`
 		v7000_model=\`printf \"same as on node A\"\`
 		v7000_enclosure_type=\`printf \"same as on node A\"\`
 		v7000_fw=\`printf \"same as on node A\"\`
