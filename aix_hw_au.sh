@@ -122,7 +122,7 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 	fi
 	if [[ \$(hostname -s) = sdp1 ]] && [[ \$hw_type = POWER9 ]]; then
 		v7000f_model=\`ssh superuser@san_console_flash 'lssystem' 2> /dev/null | grep product_name| awk '{print \$2, \$3, \$4}'| tr -d '\n';\`
-		v7000f_enclosure_type=\`ssh superuser@san_console_flash 'lsenclosure' 2> /dev/null | grep -v status | awk '{print \$3, \$4}'  | tr '\n' ' 'tr -d '\" \n'\`
+		v7000f_enclosure_type=\`ssh superuser@san_console_flash 'lsenclosure' 2> /dev/null | grep -v status | awk '{print \$3, \$4}'  | tr '\n' ' '| tr -d '\" \n'\`
 		v7000f_fw=\`ssh superuser@san_console_flash 'lssystem' 2> /dev/null | grep code_level| awk '{print \$2}'| tr -d '\n';\`
 		v7000f_ip=\`ssh superuser@san_console_flash 'lssystem' 2> /dev/null | grep console_IP| awk '{print \$2}'| tr -d '\n';\`
 		v7000f_sn=\`ssh superuser@san_console_flash 'lsenclosure' 2> /dev/null | grep -v status| awk '{print \$5}' | tr '\n' ' '\`
