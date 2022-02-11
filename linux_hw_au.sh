@@ -52,7 +52,7 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id|" && ssh -q $host "
 	max_files=\`grep fs.file /etc/sysctl.conf |grep -v '#'| awk -F [=] '{ print \$2}'|tr -d ' '|tr -d '\n'\`;
 	file_limit=\`ulimit -n|tr -d '\n'\`;
 	uptime=\`uptime | awk '{print \$3, \$4}'|tr -d ','\`;
-	nic_drivers=\`modinfo bnx2 2>/dev/null|grep ^version|awk '{print \$2}'|tr '\n' ' ';modinfo bnx2i 2>/dev/null|grep ^version|awk '{print \$2}'|tr '\n' ' ';modinfo bnx2x 2>/dev/null|grep ^version|awk '{print \$2}'|tr -d '\n'\`;
+	nic_drivers=\`modinfo bnx2 2>/dev/null|grep ^version|awk '{print \$2}'|tr '\n' ',';modinfo bnx2i 2>/dev/null|grep ^version|awk '{print \$2}'|tr '\n' ',';modinfo bnx2x 2>/dev/null|grep ^version|awk '{print \$2}'|tr -d '\n'\`;
 	case \$hw_type in 
 		IBM ) hdd_size=\`fdisk -l /dev/sda 2>/dev/null | grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
 			  hdd_model=\`smartctl -a /dev/sda | grep 'Device:' | awk '{print \$2 \$3}'|tr -d '\n'\`; 
@@ -211,6 +211,7 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id|" && ssh -q $host "
 	if [[ -z \$score ]]; then score=\`printf \"NA\"\`; fi
 	if [[ -z \$orac_ver ]]; then orac_ver=\`printf \"NA\"\`; fi
 	if [[ -z \$orad_ver ]]; then orad_ver=\`printf \"NA\"\`; fi
+	if [[ -z \$hdd_size ]]; then hdd_size=\`fdisk -l | grep Disk | grep bytes | awk '{print \$3 \$4}'| tr -d '\n' |sed 's/.\$//'\`; fi
 	if [[ -z \$hdd_heal ]]; then hdd_heal=\`printf \"NA\"\`; fi
 	if [[ -z \$java_version ]]; then java_version=\`printf \"NA\"\`; fi
 	if [[ -z \$up_version ]]; then up_version=\`printf \"NA\"\`; fi

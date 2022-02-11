@@ -64,7 +64,7 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 	ram_size=\`grep 'Memory Size:' /tmp/prtconf.txt | grep -v Good| awk '{print \$3,\$4}'| tr -d '\n';\`
 	good_ram_size=\`grep 'Good Memory Size:' /tmp/prtconf.txt | awk '{print \$4,\$5}'| tr -d '\n'; \`
 	num_of_ram_modules=\`lscfg -vp | grep -e Size | awk '{print substr (\$1,29)}'  | wc -l | bc\`
-	size_of_ram_modules=\`lscfg -vp | grep -e Size | awk '{print substr (\$1,29)}'| tr '\n' ','\`
+	size_of_ram_modules=\`lscfg -vp | grep -e Size | awk '{print substr (\$1,29)}'| tr '\n' ','|sed 's/.\$//'\`
 	page_size=\`svmon -G | grep KB | awk '{print \$1, \$2, \$3}' | tr -d '\n'\`
 	num_of_cpu=\`grep Processors /tmp/prtconf.txt | awk '{print \$4}'\`
 	cpu_speed=\`grep 'Processor Clock Speed:' /tmp/prtconf.txt | awk '{print \$4,\$5}'| tr -d '\n'; \`
@@ -104,6 +104,7 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 				if [[ -z \$v7000_sn ]]; then v7000_sn=\`printf \"NA\"\`; fi
 				if [[ -z \$v7000_fhdd ]]; then v7000_fhdd=\`printf \"NA\"\`; fi
 			nsr_version=\`printf \"NA\"\`
+			java_version=\`/usr/java6/bin/java -version 2>&1 |head -n 1| awk '{print \$3}' |tr -d '\"'|tr -d '\n'\`
 		fi
 		emc=\`printf \"NA|NA|NA\"\`
 	else
@@ -128,6 +129,7 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 		v7000f_sn=\`ssh superuser@san_console_flash 'lsenclosure' 2> /dev/null | grep -v status| awk '{print \$5}' | tr '\n' ' '\`
 		v7000f_fhdd=\`ssh superuser@san_console_flash 'lsdrive' 2> /dev/null | grep failed| wc -l | tr '\n' ' '|tr -d ' '\`
 		emc=\`printf \"NA|NA|NA\"\`
+		java_version=\`/usr/java6/bin/java -version 2>&1 |head -n 1| awk '{print \$3}' |tr -d '\"'|tr -d '\n'\`
 	fi
 	if [[ \$(hostname -s) = sdp2 ]] && [[ \$hw_type = POWER8 || \$hw_type = POWER9 ]]; then
 		emc=\`printf \"NA|NA|NA\"\`
@@ -143,6 +145,7 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 		v7000f_ip=\`printf \"same as on node A\"\`
 		v7000f_sn=\`printf \"same as on node A\"\`
 		v7000f_fhdd=\`printf \"same as on node A\"\`
+		java_version=\`/usr/java6/bin/java -version 2>&1 |head -n 1| awk '{print \$3}' |tr -d '\"'|tr -d '\n'\`
 	fi
 	if [[ \$(hostname -s) = sdp2 ]]; then
 		fcswa_model=\`printf \"same as on node A\"\`
