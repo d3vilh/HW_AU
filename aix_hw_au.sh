@@ -34,8 +34,9 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 	if [ ! -f /tmp/prtconf.txt ]; then prtconf > /tmp/prtconf.txt 2>/dev/null ; fi
 	if [ ! -f /tmp/aix_hw_au.txt ]; then su - oracle8 -c '\$ORACLE_HOME/OPatch/opatch' lsinventory 2>/dev/null > /tmp/aix_hw_au.txt; fi
 	if [ ! -f /tmp/navi_agent.txt ]; then naviseccli -user root -password comverse -scope 0 -h emc1 getagent > /tmp/navi_agent.txt 2>/dev/null; fi
-	clust_ip=\`cllsnode -i \$hostmane  2>/dev/null | grep sdp, | awk '{print \$9}';\`
-	ip_addr=\`grep -i \$hostmane_ip /etc/hosts | grep -i persist | grep -v admin | awk '{print \$1}'| tr -d '\n';\`
+	admin_clust_alias=\`cllsnw | grep ADMIN_CONNECT | awk '{print \$8}'\`
+	clust_ip=\`cllsnode -i \$hostmane  2>/dev/null | grep \$admin_clust_alias | awk '{print \$9}';\`
+	ip_addr=\`cldump|grep \$hostmane_ip|grep admin|awk '{print \$2}'|tr -d '\n';\`
 	sys_model=\`uname -M\`
 	hw_type=\`grep 'Processor Type:' /tmp/prtconf.txt| awk '{print \$3}'| tail -c 7 |tr -d '\n';\`
 	serial=\`grep 'Machine Serial Number' /tmp/prtconf.txt | awk '{print \$4}'\`
@@ -63,7 +64,7 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 	ram_size=\`grep 'Memory Size:' /tmp/prtconf.txt | grep -v Good| awk '{print \$3,\$4}'| tr -d '\n';\`
 	good_ram_size=\`grep 'Good Memory Size:' /tmp/prtconf.txt | awk '{print \$4,\$5}'| tr -d '\n'; \`
 	num_of_ram_modules=\`lscfg -vp | grep -e Size | awk '{print substr (\$1,29)}'  | wc -l | bc\`
-	size_of_ram_modules=\`lscfg -vp | grep -e Size | awk '{print substr (\$1,29)}'| tr '\n' ' '\`
+	size_of_ram_modules=\`lscfg -vp | grep -e Size | awk '{print substr (\$1,29)}'| tr '\n' ','\`
 	page_size=\`svmon -G | grep KB | awk '{print \$1, \$2, \$3}' | tr -d '\n'\`
 	num_of_cpu=\`grep Processors /tmp/prtconf.txt | awk '{print \$4}'\`
 	cpu_speed=\`grep 'Processor Clock Speed:' /tmp/prtconf.txt | awk '{print \$4,\$5}'| tr -d '\n'; \`
@@ -78,11 +79,11 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 	ngscore=\`cat /etc/BaseOS_version | grep 'SDP NGSCORE' | awk '{print \$4}' | sort | tail -1| tr -d '\n';\`
 	if [[ \$(hostname -s) = sdp1 ]] && [[ \$hw_type = POWER8 ]]; then
 		v7000_model=\`ssh superuser@san_console 'lssystem' 2> /dev/null | grep product_name| awk '{print \$2, \$3, \$4}'| tr -d '\n'|grep -v san_console;\`
-		v7000_enclosure_type=\`ssh superuser@san_console 'lsenclosure' 2> /dev/null | grep io_grp| awk '{print \$3\":\"\$7}'| tr '\n' ' '\`
-		v7000_sn=\`ssh superuser@san_console 'lsenclosure' 2> /dev/null | grep io_grp| awk '{print \$3\":\"\$8}'| tr '\n' ' '\`
+		v7000_enclosure_type=\`ssh superuser@san_console 'lsenclosure' 2> /dev/null | grep io_grp| awk '{print \$3\":\"\$7}'| tr '\n' ' '|tr -d '\" \n'\`
+		v7000_sn=\`ssh superuser@san_console 'lsenclosure' 2> /dev/null | grep io_grp| awk '{print \$3\":\"\$8}'| tr '\n' ' '|tr -d '\" \n'\`
 		v7000_fw=\`ssh superuser@san_console 'lssystem' 2> /dev/null | grep code_level| awk '{print \$2}'| tr -d '\n';\`
 		v7000_ip=\`ssh superuser@san_console 'lssystem' 2> /dev/null | grep console_IP| awk '{print \$2}'| tr -d '\n'; \`
-		v7000_fhdd=\`ssh superuser@san_console 'lsdrive' 2> /dev/null | grep failed| wc -l | tr '\n' ' '\`
+		v7000_fhdd=\`ssh superuser@san_console 'lsdrive' 2> /dev/null | grep failed| wc -l | tr -d ' '\`
 		v7000f_model=\`printf \"NA\"\`
 		v7000f_enclosure_type=\`printf \"NA\"\`
 		v7000f_fw=\`printf \"NA\"\`
@@ -91,10 +92,10 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 		v7000f_fhdd=\`printf \"NA\"\`
 		if [[ \$(oslevel -s 2> /dev/null| head -c4) = 7200 ]]; then
 			v7000f_model=\`ssh superuser@san_console_flash 'lssystem' 2> /dev/null | grep product_name| awk '{print \$2, \$3, \$4}'| tr -d '\n';\`
-			v7000f_enclosure_type=\`ssh superuser@san_console_flash 'lsenclosure' 2> /dev/null | grep -v status | awk '{print \$3, \$4}'  | tr '\n' ' '\`
+			v7000f_enclosure_type=\`ssh superuser@san_console_flash 'lsenclosure' 2> /dev/null | grep -v status | awk '{print \$3, \$4}'  | tr '\n' ' '|tr -d '\" \n'\`
 			v7000f_fw=\`ssh superuser@san_console_flash 'lssystem' 2> /dev/null | grep code_level| awk '{print \$2}'| tr -d '\n';\`
 			v7000f_ip=\`ssh superuser@san_console_flash 'lssystem' 2> /dev/null | grep console_IP| awk '{print \$2}'| tr -d '\n';\`
-			v7000f_sn=\`ssh superuser@san_console_flash 'lsenclosure' 2> /dev/null | grep -v status| awk '{print \$5}' | tr '\n' ' '\`
+			v7000f_sn=\`ssh superuser@san_console_flash 'lsenclosure' 2> /dev/null | grep -v status| awk '{print \$5}' | tr '\n' ' '|tr -d '\" \n'\`
 			v7000f_fhdd=\`ssh superuser@san_console_flash 'lsdrive' 2> /dev/null | grep failed| wc -l | tr '\n' ' ' |tr -d ' '\`
 				if [[ -z \$v7000_model ]]; then v7000_model=\`printf \"NA\"\`; fi
 				if [[ -z \$v7000_enclosure_type ]]; then v7000_enclosure_type=\`printf \"NA\"\`; fi
@@ -121,11 +122,11 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 	fi
 	if [[ \$(hostname -s) = sdp1 ]] && [[ \$hw_type = POWER9 ]]; then
 		v7000f_model=\`ssh superuser@san_console_flash 'lssystem' 2> /dev/null | grep product_name| awk '{print \$2, \$3, \$4}'| tr -d '\n';\`
-		v7000f_enclosure_type=\`ssh superuser@san_console_flash 'lsenclosure' 2> /dev/null | grep -v status | awk '{print \$3, \$4}'  | tr '\n' ' '\`
+		v7000f_enclosure_type=\`ssh superuser@san_console_flash 'lsenclosure' 2> /dev/null | grep -v status | awk '{print \$3, \$4}'  | tr '\n' ' 'tr -d '\" \n'\`
 		v7000f_fw=\`ssh superuser@san_console_flash 'lssystem' 2> /dev/null | grep code_level| awk '{print \$2}'| tr -d '\n';\`
 		v7000f_ip=\`ssh superuser@san_console_flash 'lssystem' 2> /dev/null | grep console_IP| awk '{print \$2}'| tr -d '\n';\`
 		v7000f_sn=\`ssh superuser@san_console_flash 'lsenclosure' 2> /dev/null | grep -v status| awk '{print \$5}' | tr '\n' ' '\`
-		v7000f_fhdd=\`ssh superuser@san_console_flash 'lsdrive' 2> /dev/null | grep failed| wc -l | tr '\n' ' '\`
+		v7000f_fhdd=\`ssh superuser@san_console_flash 'lsdrive' 2> /dev/null | grep failed| wc -l | tr '\n' ' '|tr -d ' '\`
 		emc=\`printf \"NA|NA|NA\"\`
 	fi
 	if [[ \$(hostname -s) = sdp2 ]] && [[ \$hw_type = POWER8 || \$hw_type = POWER9 ]]; then
