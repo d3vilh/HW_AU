@@ -10,7 +10,7 @@ host_match=$1; # Hostname to run audit
 
 lnx_ex_tmplt="MY_TEMPLATE";  # Template to exclude hosts from the /etc/hosts of your master node. i.e. grep -viE "template" /etc/hosts; its lnx_ex_tmplt="MY_TEMPLATE" by default.
 if [ "$lnx_ex_tmplt" = "MY_TEMPLATE" ]; then 
-	lnx_ex_tmplt="^ *#|audit_exclude|farm|blc|slu-dslu|amm|esm|admin|zbx|hsbu|_oob|_ilo|-om|-bb|rctu|cross|old|emc|fcs|_upm|ilo|upm_|vip|nas_console|_hsbn|_sw|-lba"; 
+	lnx_ex_tmplt="^ *#|audit_exclude|admin|_ilo|vip|nas_console"; 
 fi
 
 site_id=$2; # SITE_ID for first column
