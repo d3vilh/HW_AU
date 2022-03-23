@@ -1,0 +1,55 @@
+#!/bin/bash
+#Philipp 11.01.2016
+#v.0.1.6 +report file #v.0.1.5 +esxi inventory #v.0.1.4 Inventory files introduced. #v.1.1 esxi + nasgw #v.1.0 LINUX and AIX hosts
+# Getting start time for benchark
+start=`date +%s`;
+if [ ! -n "$1" ]; then 
+        printf "\n Runs Hardware Inventory checks across all onsite units.\n  Usage: ./audit.run SITE_ID\n    Where SITE_ID is short site name. AIX and LINUX inventory scripts will be updated with this short name on first audit.run execution.\n  Examples:\n    ./audit.run MSK\n    ./audit.run YEKATERINBURG\n    ./audit.run ROSTOV_PAPA\n  Prerequisites:\n    aix_hw_au.sh - runs Hardware Inventory checks against any AIX-based servers.\n    linux_hw_au.sh - runs Hardware Inventory checks against any Linux-based servers.\n\n  Be aware that SANbox and EMCds FCSs checks is depricated in this version, as obsolete HW\n\n";
+        exit; 
+fi;
+SITE_ID=$1
+
+#REPORT FILES NAME DEFINITION
+LNX_REPORT_FILE=$SITE_ID.LINUX-HW.`date +%d%m%y`.csv
+AIX_REPORT_FILE=$SITE_ID.AIX-HW.`date +%d%m%y`.csv
+
+#INVENTORY
+if [ ! -e inventory.$SITE_ID ] ; then
+    printf ' Site inventory file is empty!\n Update Site inventory with necessary IP list and run audit again.\n'
+    printf "#$SITE_ID INVENTORY FILE\n#V.01\n#Used to run HW INVENTORY AUDIT\n\n### UPM/OAM ###\n256.256.256.256 upm1a_example\n256.256.256.257 upmdb1a_example\n256.256.256.258 oam1a_example\n\n### SDP ###\n256.256.256.259 sdp10a #lnxsdp\n256.256.256.260 sdp13a #aixsdp\n\n### RCS ###\n\n### SGU ###\n\n### SLU ###\n\n### OSA ###\n\n### ECI ###\n\n### NOTIF ###\n\n### OFR ###\n\n### SAPI/AJMS/FEADMIN ###\n\n### DTR ###\n\n### SYSRV ###\n\n### NASGW ###\n\n### VCENTER ###\n256.256.256.259 VCENTER vcenter\n256.256.256.260 vp-x86-esxi-1\n\n### CISCO JUNIPER ARUBA ###\n\n### LBA ###\n\n### MAU ###\n\n### OTHER ###\n\n" > inventory.$SITE_ID
+    exit;
+fi
+
+#SITE FIX
+sed -i "s/PROD_SITE/$SITE_ID/g" linux_hw_au.sh; sed -i "s/PROD_SITE/$SITE_ID/g" aix_hw_au.sh; sed -i "s/PROD_SITE/$SITE_ID/g" esxi_hw_au.sh; 
+
+#LINUX COLLECT
+printf "\n Keep an eye on the progress. Human input might be required.\n\n Running HW Inventory on following units [`date +'%H:%M:%S %d.%m.%Y'`]: \n SGU, DTR, SLU, OSA, ECI, NOTIF, OFR, SAPI, AJMS, FEADMIN, UPM/OAM, OEM, UPMDB, RCS, SYSRV, NASGW, SPVE, VP-ESXI, SMSNE_APP, LNX_SDP, AIX_SDP, SMSNE_DB\n"; 
+printf ' PROGRESS: 1%%  [#.......................................] RUNNING ON: SGU\r'; ./linux_hw_au.sh sgu $SITE_ID > $LNX_REPORT_FILE; 
+printf ' PROGRESS: 5%%  [##......................................] RUNNING ON: DTR\r'; ./linux_hw_au.sh dtr $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 10%% [####....................................] RUNNING ON: SLU\r'; ./linux_hw_au.sh slu $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 15%% [######..................................] RUNNING ON: OSA\r'; ./linux_hw_au.sh osa $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 20%% [########................................] RUNNING ON: ECI\r'; ./linux_hw_au.sh eci $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 22%% [#########...............................] RUNNING ON: NOTIF\r'; ./linux_hw_au.sh notif $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 24%% [##########..............................] RUNNING ON: OFR   \r'; ./linux_hw_au.sh ofr $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 25%% [###########.............................] RUNNING ON: SAPI \r'; ./linux_hw_au.sh sapi $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 33%% [#############...........................] RUNNING ON: AJMS \r'; ./linux_hw_au.sh ajms $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 35%% [##############..........................] RUNNING ON: FEADMIN\r'; ./linux_hw_au.sh feadmin $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 40%% [################........................] RUNNING ON: UPM/UPMDB\r'; ./linux_hw_au.sh upm $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 45%% [##################......................] RUNNING ON: OAM      \r'; ./linux_hw_au.sh oam $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 50%% [####################....................] RUNNING ON: OEM\r'; ./linux_hw_au.sh oem $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 55%% [######################..................] RUNNING ON: RCS\r'; ./linux_hw_au.sh rcs $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 60%% [########################................] RUNNING ON: SYSRV\r'; ./linux_hw_au.sh sysrv $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 65%% [##########################..............] RUNNING ON: NASGW\r'; ./linux_hw_au.sh nasgw $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 66%% [##########################..............] RUNNING ON: SPVE\r'; ./linux_hw_au.sh spve $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 67%% [###########################.............] RUNNING ON: VP-ESXI\r'; ./esxi_hw_au.sh esxi $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 70%% [############################............] RUNNING ON: SMSNE_APP\r'; ./linux_hw_au.sh smsne_app $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+printf ' PROGRESS: 75%% [##############################..........] RUNNING ON: LNX_SDP   \r'; ./linux_hw_au.sh lnxsdp $SITE_ID|grep -v FILE-MAX >> $LNX_REPORT_FILE;
+#AIX COLLECT
+printf ' PROGRESS: 80%% [################################........] RUNNING ON: AIX_SDP + SMSNE_DB\r'; ./aix_hw_au.sh aixsdp $SITE_ID|grep -v FILE-MAX > $AIX_REPORT_FILE;
+printf " COMPLETED 100%%[########################################] IN $((($(date +%s)-$start))) SECONDS.                \r\n\n";
+
+#OLD REPORTS CLEANUP
+find . -name "*LINUX-HW.*.csv" -mtime +15 -exec rm {} \;
+find . -name "*AIX-HW.*.csv" -mtime +15 -exec rm {} \;
+#EOShit-codding
