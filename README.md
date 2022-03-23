@@ -4,6 +4,7 @@ Runs audit for all AIX and Linux servers in /etc/hosts of your master node and p
 
 UPDATES
 --------
+* **v.0.1.6** 23.03.2022 Now `audit.run` is universal for all sites and customers. For minimum run you need to have `audit.run, aix_hw_au.sh, linux_hw_au.sh, esxi_hw_au.sh and inventory.SITE` in the same directory.
 * **v.0.1.6** 14.03.2022 + Report files format update & rotation(+15 days older files will be deleted). You can run single audit.run file on different inventory files. + some bugfixes for lnx_hw_au.sh
 * **v.0.1.5** 28.01.2022 + esxi hosts inventory and various bugfixes  
 * **v.0.1.2** 11.01.2022 Inventory fileto store all the hosts 
