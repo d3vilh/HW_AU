@@ -10,7 +10,7 @@ host_match=$1;  # Hostname to run audit
 
 aix_ex_tmplt="MY_TEMPLATE";  # Template to exclude hosts from the /etc/hosts of your master node. i.e. grep -viE "template" /etc/hosts; its aix_ex_tmplt="MY_TEMPLATE" by default.
 if [ "$aix_ex_tmplt" = "MY_TEMPLATE" ]; then 
-	aix_ex_tmplt="^ *#|audit_exclude|localhost|farm|blu|acmi|admin|emc|v7000|om|hmc|fcs|emc|tape|asmi|zbx|hsbu|mau|rctu"; 
+	aix_ex_tmplt="^ *#|audit_exclude|localhost|farm|blu|acmi|asmi|emc|v7000|om|hmc|fcs|emc|tape|zbx|hsbu|mau|rctu"; 
 fi
 
 site_id=$2; # SITE_ID for first column
@@ -34,9 +34,9 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 	if [ ! -f /tmp/prtconf.txt ]; then prtconf > /tmp/prtconf.txt 2>/dev/null ; fi
 	if [ ! -f /tmp/aix_hw_au.txt ]; then su - oracle8 -c '\$ORACLE_HOME/OPatch/opatch' lsinventory 2>/dev/null > /tmp/aix_hw_au.txt; fi
 	if [ ! -f /tmp/navi_agent.txt ]; then naviseccli -user root -password comverse -scope 0 -h emc1 getagent > /tmp/navi_agent.txt 2>/dev/null; fi
-	admin_clust_alias=\`cllsnw | grep ADMIN_CONNECT | awk '{print \$8}'\`
-	clust_ip=\`cllsnode -i \$hostmane  2>/dev/null | grep \$admin_clust_alias | awk '{print \$9}';\`
-	ip_addr=\`cldump|grep \$hostmane_ip|grep admin|awk '{print \$2}'|tr -d '\n';\`
+	admin_clust_alias=\`su - -c cllsnw | grep ADMIN_CONNECT | awk '{print \$8}'\`
+	clust_ip=\`su - -c cllsnode -i \$hostmane  2>/dev/null | grep \$admin_clust_alias | awk '{print \$9}';\`
+	ip_addr=\`su - -c cldump|grep \$hostmane_ip|grep admin|awk '{print \$2}'|tr -d '\n';\`
 	sys_model=\`uname -M\`
 	hw_type=\`grep 'Processor Type:' /tmp/prtconf.txt| awk '{print \$3}'| tail -c 7 |tr -d '\n';\`
 	serial=\`grep 'Machine Serial Number' /tmp/prtconf.txt | awk '{print \$4}'\`
