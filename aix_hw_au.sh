@@ -1,7 +1,7 @@
 #!/bin/bash
 #  ∆  Philipp Shilov 2016 First task for support 
 # ∆ ∆ Pavel Dokuchaev 2019 added Cisco MDS FW level 
-#v.0.1.5 + ROOTVG HDD SIZE #v.0.1.4 Fedonov request #v.0.1.3 inventory file introduced #v.0.1.2 + UAC exp date #v.0.1.1 new GIT versioning #v.0.6.4 more CPU details + up_version enfastment # v.0.6.3.1 Small fix. #v.0.6.3 02.04.2021 Templates introduced # v.0.6.2.2 small fix. #v.0.6.2.1 Java and UP VER added #v.0.6.1 DBCORE VER added #v.0.6.0 P9 support added. #v.0.5.3 Added FW level Cisco MDS #v.0.5.2 30.08.2019 mass "Unknown format" fix. #v.0.5.1 21.08.2019 nsradmin and v7k get bugs fixed for NGSCORE 7.x, Oracle version added. # v0.1 15.11.2015, v.0.2 14.03.2018 NSR license ext date added, v.0.3 27.07.2018 WA for stderr and for flash storage3, v.0.4 21.03.2019 NXOS FCSW & Networker version added
+#v.0.1.6 + ROOTVG return control #v.0.1.5 + ROOTVG HDD SIZE #v.0.1.4 Fedonov request #v.0.1.3 inventory file introduced #v.0.1.2 + UAC exp date #v.0.1.1 new GIT versioning #v.0.6.4 more CPU details + up_version enfastment # v.0.6.3.1 Small fix. #v.0.6.3 02.04.2021 Templates introduced # v.0.6.2.2 small fix. #v.0.6.2.1 Java and UP VER added #v.0.6.1 DBCORE VER added #v.0.6.0 P9 support added. #v.0.5.3 Added FW level Cisco MDS #v.0.5.2 30.08.2019 mass "Unknown format" fix. #v.0.5.1 21.08.2019 nsradmin and v7k get bugs fixed for NGSCORE 7.x, Oracle version added. # v0.1 15.11.2015, v.0.2 14.03.2018 NSR license ext date added, v.0.3 27.07.2018 WA for stderr and for flash storage3, v.0.4 21.03.2019 NXOS FCSW & Networker version added
 if [ ! -n "$1" ]; then 
 	printf "\n Runs Hardware Inventory checks against any AIX-based servers.\n  Usage: ./aix_hw_au.sh HOSTNAME SITE_ID\n   Where:\n     HOSTNAME can be necessary server to run inventory on or mask for the group of hosts from the /etc/hosts\n     SITE_ID is optional parameter, will be inserted as first column of output. PROD_SITE is used by default\n  Examples:\n    ./aix_hw_au.sh sdp1b MSK\n    ./aix_hw_au.sh sdp EKT\n    ./aix_hw_au.sh sdp23\n\n";
 	exit; 
@@ -70,7 +70,7 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 	cpu_speed=\`grep 'Processor Clock Speed:' /tmp/prtconf.txt | awk '{print \$4,\$5}'| tr -d '\n'; \`
 	cpu_smt_mode=\`smtctl | grep supports | awk '{print \$6}'| tr -d '\n'; \`
 	num_cpu_cores=\`mpstat | grep configuration | awk -F '[=]' '{print \$2}' | awk '{print \$1}'| tr -d '\n'; \`
-	rootvg_size=\`getconf DISK_SIZE /dev/hdisk0| awk '{ a = \$1; rkb = a / 1000; print rkb}' OFMT='%1.0f' | tr -d '\n';\`
+	rootvg_size=\`getconf DISK_SIZE /dev/hdisk0 2> /dev/null| awk '{ a = \$1; rkb = a / 1000; print rkb}' OFMT='%1.0f' | tr -d '\n';\`
 	os_level=\`oslevel -s 2>/dev/null | tr -d '\n';\`
 	dbcore_ver=\`rpm -qa | grep DBC_TKS | awk -F '-' '{print \$2}' |tr -d '\n';\`
 	orac_ver=\`grep Client /tmp/aix_hw_au.txt |tail -1 | awk '{print \$NF}'| tr -d '\n';\`
@@ -172,6 +172,7 @@ for host in $(grep -iE $host_match $inventory_file|grep -viE "$aix_ex_tmplt"|awk
 	if [[ -z \$fcswb_sn ]]; then fcswb_sn=\`printf \"NA\"\`; fi
 	if [[ -z \$fcswb_fw ]]; then fcswb_fw=\`printf \"NA\"\`; fi
 	if [[ -z \$uac_date ]]; then uac_date=\`printf \"NA\"\`; fi
+	if [[ -z \$rootvg_size ]]; then rootvg_size=\`printf \"ERR\"\`; fi
 	printf \"\$hw_type|\$sys_model|\$serial|\$ngscore|\$dbcore_ver|\$orad_ver|\$orac_ver|\$up_version|\$java_version|\$fw|\$uac_date|\$os_level|\$blu|\$blu_sn|\$nsr_license|\$nsr_version|\$fcswa_model|\$fcswa_sn|\$fcswa_fw|\$fcswb_model|\$fcswb_sn|\$fcswb_fw|\$emc|\$v7000_model|\$v7000_enclosure_type|\$v7000_sn|\$v7000_fw|\$v7000_fhdd|\$v7000_ip|\$v7000f_model|\$v7000f_enclosure_type|\$v7000f_sn|\$v7000f_fw|\$v7000f_fhdd|\$v7000f_ip|\$clust_ip|\$ip_addr|\$hmc_ip|\$lpar|\$autorest|\$cpu_speed|\$num_of_cpu|\$cpu_smt_mode|\$num_cpu_cores|\$ram_size|\$good_ram_size|\$num_of_ram_modules|\$size_of_ram_modules|\$rootvg_size|\$page_size|\$errpt|\$uniq_errpt|\$uptm\";";
 	printf "\n";
 done;
