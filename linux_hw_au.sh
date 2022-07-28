@@ -1,6 +1,6 @@
 #!/bin/bash
 #Shilov 2015
-#v.0.1.5 esxi fields + hw_vendor fix #v.0.1.4 adjustments for A.Fedonov #v.0.1.3 Inventory file introduced #v.0.1.1 new GIT versioning #ver 2.8.7 fix for runuser #ver 2.8.6 smal fix #ver 2.8.5 Templates introduced #ver 2.8.4 new storge IBM 5k and backyp-gw #2.8.3.3 output conveyor fixed #2.8.2 +WL, UP and java ver. #fix for LNX6.9 oracle version #2.8 WA for new hosts&sy #v.2.7 02.06.2020 +kernel +ulimits +nic_drivers +component version, fixed: ora_ver for ballenger&langley #v2.6 14.01.2020: +HP Gen10 support +TimesTen version #v2.5 22.08.2019: + HDD Size and Model. #v2.4 21.08.2019: + Oracle ver. #v2.3 22.03.2019: + HW SNs. #v2.2 20.03.2018: CPU cores + threads fix. VMVARE HW_TYPE support.
+#v.0.1.5.1 Ballenger physical CPU count fix. #v.0.1.5 esxi fields + hw_vendor fix #v.0.1.4 adjustments for A.Fedonov #v.0.1.3 Inventory file introduced #v.0.1.1 new GIT versioning #ver 2.8.7 fix for runuser #ver 2.8.6 smal fix #ver 2.8.5 Templates introduced #ver 2.8.4 new storge IBM 5k and backyp-gw #2.8.3.3 output conveyor fixed #2.8.2 +WL, UP and java ver. #fix for LNX6.9 oracle version #2.8 WA for new hosts&sy #v.2.7 02.06.2020 +kernel +ulimits +nic_drivers +component version, fixed: ora_ver for ballenger&langley #v2.6 14.01.2020: +HP Gen10 support +TimesTen version #v2.5 22.08.2019: + HDD Size and Model. #v2.4 21.08.2019: + Oracle ver. #v2.3 22.03.2019: + HW SNs. #v2.2 20.03.2018: CPU cores + threads fix. VMVARE HW_TYPE support.
 if [ ! -n "$1" ]; then 
 	printf "\n Runs Hardware Inventory checks against any Linux-based servers.\n  Usage: ./linux_hw_au.sh HOSTNAME SITE_ID\n   Where:\n     HOSTNAME can be necessary server to run inventory on or mask for the group of hosts from the /etc/hosts\n   	 SITE_ID is optional parameter, will be inserted as first column of output. PROD_SITE is used by default\n  Examples:\n    ./linux_hw_au.sh sgu21b MSK\n    ./linux_hw_au.sh slu EKT\n    ./linux_hw_au.sh sgu23\n\n";
 	exit; 
@@ -146,6 +146,7 @@ do ping -c1 -W1 $host 1> /dev/null && printf "$site_id|" && ssh -q $host "
 					r_hw_vendor=\`printf \"INTEL\"\`; 
 					r_hw_type=\`printf 'INTEL BALLENGER '&&dmidecode | grep -m 1 'Product Name'| awk '{print \$3}'| tr -d '\n'\`;
 					r_hw_sn=\`dmidecode | grep -A3 -i 'Product Name'| head -3 | grep Serial | awk '{print \$3}'| tr -d '\n'\`;
+					phy_c_count=\`dmidecode -t 4 |grep -i 'Socket Designation'|wc -l|tr -d '\n'\`;
 		;; 
 		DPM3 ) hdd_size=\`fdisk -l /dev/sda 2>/dev/null | grep GB | awk '{print \$3 \$4}' | tr -d ','|tr -d '\n'\`; 
 			   hdd_model=\`smartctl -a /dev/sda | grep 'Device:' | awk '{print \$2 \$3}'|tr -d '\n'\`; 
