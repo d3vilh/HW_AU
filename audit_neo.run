@@ -1,6 +1,6 @@
 #!/bin/bash
 #Philipp 11.01.2016
-#v.0.1.7 rewrited with functions. v.0.1.6 +report file #v.0.1.5 +esxi inventory #v.0.1.4 Inventory files introduced. #v.1.1 esxi + nasgw #v.1.0 LINUX and AIX hosts
+#v.0.1.7.1 rewrited with functions. v.0.1.6 +report file #v.0.1.5 +esxi inventory #v.0.1.4 Inventory files introduced. #v.1.1 esxi + nasgw #v.1.0 LINUX and AIX hosts
 # Getting start time for benchark
 start=`date +%s`;
 if [ ! -n "$1" ]; then 
@@ -38,7 +38,7 @@ fi
 sed -i "s/PROD_SITE/$SITE_ID/g" linux_hw_au.sh; sed -i "s/PROD_SITE/$SITE_ID/g" aix_hw_au.sh; sed -i "s/PROD_SITE/$SITE_ID/g" esxi_hw_au.sh; 
 
 # LINUX COLLECT
-units=("SGU" "DTR" "SLU" "OSA" "ECI" "NOTIF" "OFR" "SAPI" "AJMS" "FEADMIN" "UPM/UPMDB" "OAM" "OEM" "RCS" "SYSRV" "NASGW" "SPVE" "VP-ESXI" "SMSNE-APP" "LNX-SDP" "AIX_SDP + SMSNE_DB")
+units=("sgu" "dtr" "slu" "osa" "eci" "notif" "ofr" "sapi" "ajms" "feadmin" "upm" "oam" "oem" "rcs" "sysrv" "nasgw" "spve" "esxi" "smsne_app" "lnxsdp" "AIX_SDP + SMSNE_DB")
 counter=1
 total=${#units[@]}
 
