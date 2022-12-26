@@ -4,6 +4,7 @@ Runs audit for all AIX and Linux servers in /etc/hosts of your master node and p
 
 UPDATES
 --------
+* **v.0.1.7** 26.12.2022 audit_new.run - new version of audit.run. Universal for all the sites.
 * **v.0.1.6** 23.03.2022 Now `audit.run` is universal for all sites and customers. For minimum run you need to have `audit.run, aix_hw_au.sh, linux_hw_au.sh, esxi_hw_au.sh and inventory.SITE` in the same directory.
 * **v.0.1.6** 14.03.2022 + Report files format update & rotation(+15 days older files will be deleted). You can run single audit.run file on different inventory files. + some bugfixes for lnx_hw_au.sh
 * **v.0.1.5** 28.01.2022 + esxi hosts inventory and various bugfixes  
@@ -48,6 +49,12 @@ CELCO:oam1a:/root# grep audit_exclude inventory.CELCO
 10.1.1.112 upmdb1a #audit_exclude
 10.1.1.113 upmdb1b #audit_exclude
 10.1.1.234 BitCoin1 miner1 #audit_exclude 
+```
+Different SDP types(Linux or AIX) inside `inventory.SITE_ID` file should be marked by `#aixsdp` or `#lnxsdp` tags, as shown below.
+``` shell
+CELCO:oam1a:/root# grep sdp inventory.CELCO 
+10.1.1.112 sdp1a #lnxsdp
+10.1.1.114 sdp2a #aixsdp
 ```
 **FOR BASIC INVENTORY** - skip preparation and go to next step - [FULL SITE INVENTORY](https://github.com/d3vilh/HW_AU#full-site-inventory)
 
@@ -189,7 +196,7 @@ CELCO-UPM1a:upm1:#
 ```
 Both CSV files will contain all the inventory data with pipe (`|`) symbol used as the columns delimiter:
 ``` shell
-CELCO-UPM1a:upm1:# head -2 YAR.LINUX_HW_LIST.csv
+CELCO-UPM1a:upm1:# head -2 CELCO.LINUX_HW_LIST.csv
 SITE |HOSTNAME |IP ADDR    |ROUTE    |HW TYPE              |HW SN |LNX SCORE |KERNEL               |HW ARCH |APP VERSION |APP INSTALL DATE(M/D/Y) |UP VERSION |ORA CLI    |ORA DB |TT DB |WL VERSION |JAVA VER  |RAM     |CORES |THREADS |ENA CORES |CPU            |HDD SIZE |HDD MODEL         |HDD HEALTH |ACTIVE UEFI BANK |UEFI/BIOS VERSION |FILE-MAX (sysctl.conf) |FILE-LIMIT (ulimit -n)|UPTIME   |NIC DRVs                 |EMC MODEL |EMC SERIAL |EMC FLARE |V7k MODEL |V7k TYPE |V7k ENCLOSURE SN |v7K FW |V7k failed HDDs |V7k CONSOLE |DD MODEL |DD SERIAL |DD OS |DD DISK STATUS |DD UPTIME 
 CELCO|sgu1a    |10.1.1.100 |10.1.1.1 |ProLiant BL460c Gen8 |OLOLO |6.2.1     | 2.6.32-220.el6.i686 |i686    |7.0.5       | Mon Apr 10 2017        |4.120.0    |11.2.0.3.0 |NA     |NA    |NA         | 1.6.0_31 |3983136 |6     |12      |6         |E5-2620Xeon(R) |300.0GB  |HP LOGICAL VOLUME |OK         |HP NA            | 1.51             | 20000                 |8192                  |327 days |2.1.11 2.7.0.3 1.70.00-0 |NA        |NA         |NA        |NA        |NA       |NA               |NA     |NA              |NA          |NA       |NA        |NA    |NA             | NA
 CELCO-UPM1a:upm1:#
